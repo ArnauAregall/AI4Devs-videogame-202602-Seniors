@@ -36,6 +36,7 @@
 | `game-requirements` | `.ai-specs/skills/game-requirements/SKILL.md` | "write requirements for", "define subsystem", "document behaviour of" |
 | `phaser-implementer` | `.ai-specs/skills/phaser-implementer/SKILL.md` | "implement", "code this feature", "write the Phaser scene" |
 | `game-qa` | `.ai-specs/skills/game-qa/SKILL.md` | "write tests for", "test this mechanic", "qa coverage" |
+| `sprite-provisioner` | `.ai-specs/skills/sprite-provisioner/SKILL.md` | "provision sprites", "copy assets", "set up assets for", "prepare sprites for [subsystem]" — invoke before any implementer-agent session that requires sprites for the target subsystem |
 
 ---
 
