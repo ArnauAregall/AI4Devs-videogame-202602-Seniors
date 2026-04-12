@@ -41,8 +41,6 @@ export class GameScene extends Scene {
     private _lastHp                = -1;
     private _lastLives             = -1;
     private _lastSpecialCooldown   = -1;
-    /** Tracks the enemy-type at spawn time for score calculation on defeat. */
-    private _spawnedTypes: Map<string, string> = new Map();
     private _bossId:       string | null       = null;
     private _lastBossHp                        = -1;
     private _comboCount                        = 0;
@@ -106,16 +104,10 @@ export class GameScene extends Scene {
 
         // ── HUD event wiring ────────────────────────────────────────────────
 
-        // Track enemy types at spawn for score lookup on defeat.
-        this.events.on('enemySpawn', (payload: { id: string; type: string }) => {
-            this._spawnedTypes.set(payload.id, payload.type);
-        });
-
         // Emit SCORE_CHANGED when an enemy is defeated.
-        this.events.on('enemyDefeated', (payload: { id: string }) => {
-            const type = this._spawnedTypes.get(payload.id) ?? '';
-            this._spawnedTypes.delete(payload.id);
-            const delta = this._scoreForType(type);
+        // EnemyManager now includes the enemy type in the enemyDefeated payload.
+        this.events.on('enemyDefeated', (payload: { id: string; type: string }) => {
+            const delta = this._scoreForType(payload.type);
             this._score += delta;
             this.events.emit(GameEvents.SCORE_CHANGED, { score: this._score, delta });
         });

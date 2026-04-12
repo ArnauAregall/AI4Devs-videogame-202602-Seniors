@@ -48,6 +48,8 @@ export class EnemyManager {
   private readonly _enemies:      Map<string, EnemyController> = new Map();
   /** Drop tables keyed by enemy ID. */
   private readonly _dropTables:   Map<string, ItemDropEntry[]> = new Map();
+  /** Archetype type keyed by enemy ID — used to enrich enemyDefeated events. */
+  private readonly _enemyTypes:   Map<string, string> = new Map();
   /** Tracks spawned zoneIds to prevent duplicate spawns. */
   private readonly _spawnedZones: Set<string> = new Set();
   private          _grabFrozen:   boolean = false;
@@ -106,6 +108,7 @@ export class EnemyManager {
     this._scene.events.off('playerGrabEnd',   this._onGrabEnd,   this);
     for (const enemy of this._enemies.values()) enemy.destroy();
     this._enemies.clear();
+    this._enemyTypes.clear();
     this._coordinator.reset();
   }
 
@@ -154,6 +157,7 @@ export class EnemyManager {
     }
 
     this._enemies.set(id, enemy);
+    this._enemyTypes.set(id, payload.type);
     if (payload.dropTable) this._dropTables.set(id, payload.dropTable);
     if (this._grabFrozen) enemy.freeze();
   }
@@ -205,7 +209,9 @@ export class EnemyManager {
         enemy.destroy();
         this._enemies.delete(id);
         this._dropTables.delete(id);
-        this._scene.events.emit('enemyDefeated', { id });
+        const type = this._enemyTypes.get(id) ?? '';
+        this._enemyTypes.delete(id);
+        this._scene.events.emit('enemyDefeated', { id, type });
       }
     }
   }
