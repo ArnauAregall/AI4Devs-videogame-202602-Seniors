@@ -43,6 +43,31 @@ export const ASSET_KEY_PUNK_HURT   = 'punk-hurt';
 export const ASSET_KEY_PUNK_DEATH  = 'punk-death';
 
 // ------------------------------------------------------------
+// Enemy — Boss (Brute Arms) (source: brute-arms-boss)
+// Verified frame sizes from actual PNG dimensions:
+//   idle:     100×101 px (8 frames — 800×101 sheet)
+//   walk:     100×100 px (6 frames — 600×100 sheet)
+//   attack-1: 160×128 px (7 frames — 1120×128 sheet)
+//   attack-2: 160×128 px (5 frames —  800×128 sheet)
+//   attack-3: 160×128 px (5 frames —  800×128 sheet)
+//   attack-4: 160×128 px (8 frames — 1280×128 sheet)
+//   hurt:     160×128 px (8 frames — 1280×128 sheet)
+//   jump:     120×128 px (10 frames — 1200×128 sheet)
+// No dedicated death sheet — boss-hurt used as placeholder.
+// ------------------------------------------------------------
+
+export const ASSET_KEY_BOSS_IDLE      = 'boss-idle';
+export const ASSET_KEY_BOSS_WALK      = 'boss-walk';
+export const ASSET_KEY_BOSS_ATTACK_1  = 'boss-attack-1';
+export const ASSET_KEY_BOSS_ATTACK_2  = 'boss-attack-2';
+export const ASSET_KEY_BOSS_ATTACK_3  = 'boss-attack-3';
+export const ASSET_KEY_BOSS_ATTACK_4  = 'boss-attack-4';
+export const ASSET_KEY_BOSS_HURT      = 'boss-hurt';
+export const ASSET_KEY_BOSS_JUMP      = 'boss-jump';
+// Placeholder — no death sheet; reuses hurt until a dedicated asset is sourced
+export const ASSET_KEY_BOSS_DEATH     = 'boss-death';
+
+// ------------------------------------------------------------
 // Stage layers — Streets of Fight (source: streets-of-fight)
 // ------------------------------------------------------------
 
@@ -128,6 +153,17 @@ export const ASSET_PATH: Readonly<Record<string, string>> = {
   [ASSET_KEY_PUNK_HURT]:   'enemies/punk/punk-hurt.png',
   // Placeholder: reuses hurt sheet until a dedicated death sprite is sourced
   [ASSET_KEY_PUNK_DEATH]:  'enemies/punk/punk-hurt.png',
+  // Enemy Boss (Brute Arms)
+  [ASSET_KEY_BOSS_IDLE]:     'boss/boss-idle.png',
+  [ASSET_KEY_BOSS_WALK]:     'boss/boss-walk.png',
+  [ASSET_KEY_BOSS_ATTACK_1]: 'boss/boss-attack-1.png',
+  [ASSET_KEY_BOSS_ATTACK_2]: 'boss/boss-attack-2.png',
+  [ASSET_KEY_BOSS_ATTACK_3]: 'boss/boss-attack-3.png',
+  [ASSET_KEY_BOSS_ATTACK_4]: 'boss/boss-attack-4.png',
+  [ASSET_KEY_BOSS_HURT]:     'boss/boss-hurt.png',
+  [ASSET_KEY_BOSS_JUMP]:     'boss/boss-jump.png',
+  // Placeholder: reuses hurt until dedicated death asset is sourced
+  [ASSET_KEY_BOSS_DEATH]:    'boss/boss-hurt.png',
   // Stage layers — Streets of Fight
   [ASSET_KEY_STAGE_BACK]:     'stage/layers/stage-back.png',
   [ASSET_KEY_STAGE_FORE]:     'stage/layers/stage-fore.png',
@@ -189,6 +225,17 @@ export const ASSET_FRAME_CONFIG: Readonly<Record<string, FrameConfig>> = {
   [ASSET_KEY_PUNK_HURT]:  { frameWidth: 96, frameHeight: 63 }, // 4 frames (384÷96)
   // Placeholder: same dimensions as hurt (reuses hurt sheet)
   [ASSET_KEY_PUNK_DEATH]: { frameWidth: 96, frameHeight: 63 }, // 4 frames (384÷96)
+  // Enemy Boss (Brute Arms) — verified from actual PNG dimensions
+  [ASSET_KEY_BOSS_IDLE]:     { frameWidth: 100, frameHeight: 101 }, //  8 frames (800÷100)
+  [ASSET_KEY_BOSS_WALK]:     { frameWidth: 100, frameHeight: 100 }, //  6 frames (600÷100)
+  [ASSET_KEY_BOSS_ATTACK_1]: { frameWidth: 160, frameHeight: 128 }, //  7 frames (1120÷160)
+  [ASSET_KEY_BOSS_ATTACK_2]: { frameWidth: 160, frameHeight: 128 }, //  5 frames  (800÷160)
+  [ASSET_KEY_BOSS_ATTACK_3]: { frameWidth: 160, frameHeight: 128 }, //  5 frames  (800÷160)
+  [ASSET_KEY_BOSS_ATTACK_4]: { frameWidth: 160, frameHeight: 128 }, //  8 frames (1280÷160)
+  [ASSET_KEY_BOSS_HURT]:     { frameWidth: 160, frameHeight: 128 }, //  8 frames (1280÷160)
+  [ASSET_KEY_BOSS_JUMP]:     { frameWidth: 120, frameHeight: 128 }, // 10 frames (1200÷120)
+  // Placeholder: same dimensions as hurt (reuses hurt sheet)
+  [ASSET_KEY_BOSS_DEATH]:    { frameWidth: 160, frameHeight: 128 }, //  8 frames (1280÷160)
   // Cyberpunk decorations — 336×160 tileset; frame size TBD after visual inspection
   [ASSET_KEY_CYBERPUNK_DECORATIONS]: { frameWidth: 16, frameHeight: 16 }, // TODO: verify
 };

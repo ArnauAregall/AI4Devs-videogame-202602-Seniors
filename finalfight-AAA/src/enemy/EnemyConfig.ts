@@ -185,3 +185,24 @@ export const BOSS_PUNCH_OFFSET_PX         = 14;
 export const BOSS_PUNCH_Y_OFFSET          = 16;
 /** Phase 2+ kick alternates every N frames. */
 export const BOSS_KICK_ALTERNATE_FRAMES   = 2;
+
+/** Phaser animation keys for the Boss (Brute Arms) sprite sheets. */
+export const BOSS_ANIM_IDLE   = 'boss-anim-idle';
+export const BOSS_ANIM_WALK   = 'boss-anim-walk';
+export const BOSS_ANIM_ATTACK = 'boss-anim-attack';
+export const BOSS_ANIM_HURT   = 'boss-anim-hurt';
+export const BOSS_ANIM_DEATH  = 'boss-anim-death';
+
+/** Frame counts per boss animation clip. */
+export const BOSS_ANIM_IDLE_FRAMES   = 8;  // BruteArm_Idle.png   800÷100
+export const BOSS_ANIM_WALK_FRAMES   = 6;  // BruteArm_Walk.png   600÷100
+export const BOSS_ANIM_ATTACK_FRAMES = 7;  // BruteArm_attack01.png 1120÷160
+export const BOSS_ANIM_HURT_FRAMES   = 8;  // BruteArm_Hurt.png  1280÷160
+export const BOSS_ANIM_DEATH_FRAMES  = 8;  // reuses hurt sheet
+
+/** Frame rates (fps) per boss animation clip. */
+export const BOSS_ANIM_IDLE_FPS   = 8;
+export const BOSS_ANIM_WALK_FPS   = 10;
+export const BOSS_ANIM_ATTACK_FPS = 12;
+export const BOSS_ANIM_HURT_FPS   = 12;
+export const BOSS_ANIM_DEATH_FPS  = 8;

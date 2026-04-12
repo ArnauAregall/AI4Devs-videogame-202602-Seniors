@@ -23,10 +23,10 @@ import {
   BOSS_HURT_FRAMES, BOSS_KNOCKDOWN_FRAMES,
   BOSS_ATTACK_STARTUP_FRAMES, BOSS_PUNCH_OFFSET_PX, BOSS_PUNCH_Y_OFFSET,
   BOSS_KICK_ALTERNATE_FRAMES,
-  PUNK_ANIM_IDLE, PUNK_ANIM_WALK, PUNK_ANIM_ATTACK, PUNK_ANIM_HURT, PUNK_ANIM_DEATH,
+  BOSS_ANIM_IDLE, BOSS_ANIM_WALK, BOSS_ANIM_ATTACK, BOSS_ANIM_HURT, BOSS_ANIM_DEATH,
 } from './EnemyConfig';
-import { ASSET_KEY_PUNK_IDLE } from '../assets/AssetKeys';
-import { registerPunkAnims }   from './EnemyAnimations';
+import { ASSET_KEY_BOSS_IDLE } from '../assets/AssetKeys';
+import { registerBossAnims }   from './EnemyAnimations';
 
 export interface BossConfig {
   scene:        Phaser.Scene;
@@ -52,11 +52,11 @@ export class BossController extends EnemyController {
   get phase(): number { return this._phase; }
 
   constructor(cfg: BossConfig, onArrived?: () => void) {
-    registerPunkAnims(cfg.scene);
+    registerBossAnims(cfg.scene);
     const base: EnemyControllerConfig = {
       scene:           cfg.scene,
       id:              cfg.id,
-      textureKey:      ASSET_KEY_PUNK_IDLE,
+      textureKey:      ASSET_KEY_BOSS_IDLE,
       x:               cfg.x,
       y:               cfg.y,
       facingRight:     cfg.facingRight,
@@ -70,13 +70,13 @@ export class BossController extends EnemyController {
       combatSystem:    cfg.combatSystem,
       coordinator:     cfg.coordinator,
       animKeys: {
-        [EnemyState.Idle]:      PUNK_ANIM_IDLE,
-        [EnemyState.Patrol]:    PUNK_ANIM_WALK,
-        [EnemyState.Aggro]:     PUNK_ANIM_WALK,
-        [EnemyState.Attack]:    PUNK_ANIM_ATTACK,
-        [EnemyState.Hurt]:      PUNK_ANIM_HURT,
-        [EnemyState.Knockdown]: PUNK_ANIM_HURT,
-        [EnemyState.Death]:     PUNK_ANIM_DEATH,
+        [EnemyState.Idle]:      BOSS_ANIM_IDLE,
+        [EnemyState.Patrol]:    BOSS_ANIM_WALK,
+        [EnemyState.Aggro]:     BOSS_ANIM_WALK,
+        [EnemyState.Attack]:    BOSS_ANIM_ATTACK,
+        [EnemyState.Hurt]:      BOSS_ANIM_HURT,
+        [EnemyState.Knockdown]: BOSS_ANIM_HURT,
+        [EnemyState.Death]:     BOSS_ANIM_DEATH,
       },
       showHealthBar: false, // Boss uses HUD boss health bar instead. @spec FR-EB-26
     };
