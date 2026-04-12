@@ -4,6 +4,7 @@ const mocks = vi.hoisted(() => {
   const spriteMock = {
     x: 100, y: 150,
     setFlipX:    vi.fn(),
+    setDepth: vi.fn(),
     setVelocityX: vi.fn(),
     setVelocityY: vi.fn(),
     destroy:      vi.fn(),
@@ -17,7 +18,7 @@ const mocks = vi.hoisted(() => {
 });
 
 vi.mock('phaser', () => ({
-  default: { Scene: class {} },
+  default: { Scene: class {}, Scale: { FIT: 'FIT', NONE: 'NONE', CENTER_BOTH: 'CENTER_BOTH' } },
   Scene:   class {},
 }));
 

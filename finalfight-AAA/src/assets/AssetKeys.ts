@@ -89,6 +89,14 @@ export const ASSET_KEY_CYBERPUNK_DECORATIONS = 'cyberpunk-decorations';
 
 export const ASSET_KEY_COMMON_SHADOW = 'common-shadow';
 
+// ------------------------------------------------------------
+// UI / Boot — loaded by BootScene only (not part of ASSET_PATH)
+// ------------------------------------------------------------
+
+export const ASSET_KEY_LOADING_BG  = 'loading-bg';
+/** Path relative to public/assets/, used by Boot scene. */
+export const ASSET_PATH_LOADING_BG = 'bg.png';
+
 // ============================================================
 // ASSET_PATH — maps every key to its relative path under
 // public/assets/. Used as the second argument to Phaser load
@@ -170,11 +178,11 @@ export const ASSET_FRAME_CONFIG: Readonly<Record<string, FrameConfig>> = {
   [ASSET_KEY_PLAYER_GETUP]:     { frameWidth: 96, frameHeight: 63 },
   [ASSET_KEY_PLAYER_GRAB]:      { frameWidth: 96, frameHeight: 63 },
   [ASSET_KEY_PLAYER_SPECIAL]:   { frameWidth: 96, frameHeight: 63 },
-  // Enemy Punk
-  [ASSET_KEY_PUNK_IDLE]:  { frameWidth: 80, frameHeight: 80 }, // TODO: verify
-  [ASSET_KEY_PUNK_WALK]:  { frameWidth: 80, frameHeight: 80 }, // TODO: verify
-  [ASSET_KEY_PUNK_PUNCH]: { frameWidth: 80, frameHeight: 80 }, // TODO: verify
-  [ASSET_KEY_PUNK_HURT]:  { frameWidth: 80, frameHeight: 80 }, // TODO: verify
+  // Enemy Punk — verified 96×63 px per frame (same sheet convention as player)
+  [ASSET_KEY_PUNK_IDLE]:  { frameWidth: 96, frameHeight: 63 }, // 4 frames (384÷96)
+  [ASSET_KEY_PUNK_WALK]:  { frameWidth: 96, frameHeight: 63 }, // 4 frames (384÷96)
+  [ASSET_KEY_PUNK_PUNCH]: { frameWidth: 96, frameHeight: 63 }, // 3 frames (288÷96)
+  [ASSET_KEY_PUNK_HURT]:  { frameWidth: 96, frameHeight: 63 }, // 4 frames (384÷96)
   // Cyberpunk decorations — 336×160 tileset; frame size TBD after visual inspection
   [ASSET_KEY_CYBERPUNK_DECORATIONS]: { frameWidth: 16, frameHeight: 16 }, // TODO: verify
 };

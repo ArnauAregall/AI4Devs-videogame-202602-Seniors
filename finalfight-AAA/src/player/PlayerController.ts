@@ -192,6 +192,7 @@ export class PlayerController {
 
     // ── Sprite ──────────────────────────────────────────────────────────────
     this.sprite = scene.physics.add.sprite(x, y, ASSET_KEY_PLAYER_IDLE);
+    this.sprite.setDepth(GameConfig.ENTITY_DEPTH);
 
     // ── Animations ──────────────────────────────────────────────────────────
     this._createAnimations();

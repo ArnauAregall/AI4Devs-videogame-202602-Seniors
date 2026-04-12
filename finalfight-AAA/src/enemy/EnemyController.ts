@@ -8,6 +8,7 @@
  * @implements FR-EA-05 through FR-EA-17
  */
 import Phaser from 'phaser';
+import { GameConfig }                  from '../config/GameConfig';
 import { CombatSystem } from '../combat/CombatSystem';
 import { HitEvent }                    from '../combat/HitEvent';
 import { AttackerCoordinator }         from './AttackerCoordinator';
@@ -89,6 +90,7 @@ export abstract class EnemyController {
     this._coordinator     = cfg.coordinator;
 
     this._sprite = cfg.scene.physics.add.sprite(cfg.x, cfg.y, cfg.textureKey);
+    this._sprite.setDepth(GameConfig.ENTITY_DEPTH);
     this._sprite.setFlipX(!cfg.facingRight);
 
     this._hurtboxId   = `enemy_${cfg.id}`;

@@ -10,6 +10,11 @@ export const GameConfig = {
   /** 'FIT' = scale to fill window while preserving aspect ratio; 'FIXED' = no scaling */
   SCALE_MODE: 'FIT' as 'FIT' | 'FIXED',
 
+  // ── Render depths ────────────────────────────────────────────
+  /** Background parallax layers use depths 0–5. Props=6, items=7.
+   *  Player and enemy sprites must render above all of these. */
+  ENTITY_DEPTH: 8,
+
   // ── Player stats ────────────────────────────────────────────
   /** @spec FR-PL-14 */
   PLAYER_MAX_HP: 100,

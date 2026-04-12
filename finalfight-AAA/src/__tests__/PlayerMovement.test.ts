@@ -5,6 +5,7 @@ const mocks = vi.hoisted(() => {
   const spriteMock = {
     x: 0, y: 0,
     setFlipX: vi.fn(),
+    setDepth: vi.fn(),
     play: vi.fn(),
     anims: { setRepeat: vi.fn(), currentAnim: null },
     on: vi.fn(),
