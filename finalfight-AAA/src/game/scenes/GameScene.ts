@@ -3,6 +3,8 @@ import { GameConfig } from '../../config/GameConfig';
 import { PlayerController } from '../../player/PlayerController';
 import { StageManager } from '../../stage/StageManager';
 import { stage1Data } from '../../data/stage1Data';
+import { CombatSystem } from '../../combat/CombatSystem';
+import { DebugRenderer } from '../../combat/DebugRenderer';
 
 type FixedUpdateFn = (dt: number) => void;
 
@@ -15,6 +17,11 @@ export class GameScene extends Scene {
 
     /** @spec game-scene – Requirement: getStageManager() accessor */
     private _stageManager: StageManager | null = null;
+
+    /** @spec game-scene – Requirement: getCombatSystem() accessor */
+    private _combatSystem: CombatSystem | null = null;
+
+    private _debugRenderer: DebugRenderer | null = null;
 
     /** Physics group for all player attack hitboxes. Queried by combat-system. */
     playerHitboxGroup!: Phaser.Physics.Arcade.StaticGroup;
@@ -37,12 +44,18 @@ export class GameScene extends Scene {
         this.input.keyboard?.on('keydown-ESC', () => this.pauseGame());
         this.input.keyboard?.on('keydown-P', () => this.pauseGame());
 
+        // Combat system — must be created before PlayerController so player can register hurtbox
+        this._combatSystem = new CombatSystem();
+        this.registerFixedUpdate(this._combatSystem.fixedUpdate.bind(this._combatSystem));
+
+        // Debug renderer (render-frame, not fixed tick)
+        this._debugRenderer = new DebugRenderer(this, this._combatSystem);
+
         // Spawn player at centre of ground plane
         const spawnX = GameConfig.CANVAS_WIDTH / 2;
         const spawnY = (GameConfig.GROUND_TOP + GameConfig.GROUND_BOTTOM) / 2;
-        this._player = new PlayerController(this, spawnX, spawnY);
+        this._player = new PlayerController(this, spawnX, spawnY, null, this._combatSystem);
 
-        // TODO(combat): register combat fixed-update callback here
         // TODO(enemy-ai): register enemy-ai fixed-update callback here
         // TODO(hud): register hud fixed-update callback here
 
@@ -79,6 +92,9 @@ export class GameScene extends Scene {
         if (this._accumulator > 0) {
             this._accumulator = 0;
         }
+
+        // Debug renderer runs every render frame (not fixed tick)
+        this._debugRenderer?.update();
     }
 
     pauseGame(): void {
@@ -108,6 +124,14 @@ export class GameScene extends Scene {
      */
     getStageManager(): StageManager | null {
         return this._stageManager;
+    }
+
+    /**
+     * Returns the active CombatSystem, or null if not yet created.
+     * @spec game-scene – Requirement: getCombatSystem() accessor
+     */
+    getCombatSystem(): CombatSystem | null {
+        return this._combatSystem;
     }
 
     /**

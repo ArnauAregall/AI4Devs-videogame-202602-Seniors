@@ -55,6 +55,10 @@ export const GameConfig = {
   STAGE_TRANSITION_FADE_MS: 500,
   /** Half-width (px) of the player body used for boundary clamping. @spec FR-SM-05 */
   PLAYER_BODY_HALF_WIDTH: 20,
+
+  // ── Combat ───────────────────────────────────────────────────────────────
+  /** When true, DebugRenderer draws hitbox/hurtbox outlines each frame. @spec FR-CS-17, NFR-CS-04 */
+  DEBUG_HITBOXES: false,
 } as const;
 
 export const PhaserGameConfig: Phaser.Types.Core.GameConfig = {

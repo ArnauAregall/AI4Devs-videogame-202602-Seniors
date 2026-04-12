@@ -18,14 +18,60 @@ import { PlayerState } from './PlayerState';
 import { PlayerStateMachine } from './PlayerStateMachine';
 import { InputManager } from '../input/InputManager';
 import type { InputState } from '../input/InputState';
+import type { CombatSystem } from '../combat/CombatSystem';
+import {
+  PLAYER_JAB_HITBOX_W,
+  PLAYER_JAB_HITBOX_H,
+  PLAYER_PUNCH_HITBOX_W,
+  PLAYER_PUNCH_HITBOX_H,
+  PLAYER_KICK_HITBOX_W,
+  PLAYER_KICK_HITBOX_H,
+  PLAYER_SPECIAL_HITBOX_W,
+  PLAYER_SPECIAL_HITBOX_H,
+  PLAYER_HURTBOX_W,
+  PLAYER_HURTBOX_H,
+  PLAYER_JAB_DAMAGE,
+  PLAYER_PUNCH_DAMAGE,
+  PLAYER_KICK_DAMAGE,
+  PLAYER_SPECIAL_DAMAGE_MULTIPLIER,
+  PLAYER_LIGHT_KNOCKBACK_X,
+  PLAYER_LIGHT_KNOCKBACK_Y,
+  PLAYER_HEAVY_KNOCKBACK_X,
+  PLAYER_HEAVY_KNOCKBACK_Y,
+  LIGHT_HIT_STUN_FRAMES,
+  HEAVY_HIT_STUN_FRAMES,
+  GRAB_INVINCIBILITY_FRAMES,
+} from '../combat/CombatConfig';
 
-// ── Hitbox dimensions per attack state (px, no magic numbers) ────────────────
+// ── Hitbox dimensions per attack state (px, from CombatConfig constants) ─────
 const HITBOX: Record<string, { w: number; h: number; offsetX: number; offsetY: number }> = {
-  [PlayerState.LightAttack]:  { w: 30, h: 20, offsetX: 30, offsetY: -8 },
-  [PlayerState.HeavyAttack]:  { w: 42, h: 30, offsetX: 32, offsetY: -4 },
-  [PlayerState.JumpAttack]:   { w: 36, h: 28, offsetX: 24, offsetY: -16 },
-  [PlayerState.Grab]:         { w: 24, h: 24, offsetX: 20, offsetY: -8 },
-  [PlayerState.SpecialAttack]: { w: 60, h: 50, offsetX: 0,  offsetY: -16 },
+  [PlayerState.LightAttack]:  { w: PLAYER_JAB_HITBOX_W,     h: PLAYER_JAB_HITBOX_H,     offsetX: 30, offsetY: -8 },
+  [PlayerState.HeavyAttack]:  { w: PLAYER_KICK_HITBOX_W,    h: PLAYER_KICK_HITBOX_H,    offsetX: 32, offsetY: -4 },
+  [PlayerState.JumpAttack]:   { w: PLAYER_PUNCH_HITBOX_W,   h: PLAYER_PUNCH_HITBOX_H,   offsetX: 24, offsetY: -16 },
+  [PlayerState.Grab]:         { w: PLAYER_JAB_HITBOX_W,     h: PLAYER_JAB_HITBOX_H,     offsetX: 20, offsetY: -8 },
+  [PlayerState.SpecialAttack]: { w: PLAYER_SPECIAL_HITBOX_W, h: PLAYER_SPECIAL_HITBOX_H, offsetX: 0,  offsetY: -16 },
+};
+
+/** Combat parameters per attack state for CombatSystem registration. */
+interface CombatHitboxParams {
+  damage: number;
+  knockbackX: number;
+  knockbackY: number;
+  hitStunFrames: number;
+  isAoe: boolean;
+}
+
+const COMBAT_HITBOX: Record<string, CombatHitboxParams> = {
+  [PlayerState.LightAttack]:   { damage: PLAYER_JAB_DAMAGE,   knockbackX: PLAYER_LIGHT_KNOCKBACK_X, knockbackY: PLAYER_LIGHT_KNOCKBACK_Y, hitStunFrames: LIGHT_HIT_STUN_FRAMES, isAoe: false },
+  [PlayerState.HeavyAttack]:   { damage: PLAYER_KICK_DAMAGE,  knockbackX: PLAYER_HEAVY_KNOCKBACK_X, knockbackY: PLAYER_HEAVY_KNOCKBACK_Y, hitStunFrames: HEAVY_HIT_STUN_FRAMES, isAoe: false },
+  [PlayerState.JumpAttack]:    { damage: PLAYER_PUNCH_DAMAGE, knockbackX: PLAYER_LIGHT_KNOCKBACK_X, knockbackY: PLAYER_LIGHT_KNOCKBACK_Y, hitStunFrames: LIGHT_HIT_STUN_FRAMES, isAoe: false },
+  [PlayerState.SpecialAttack]: {
+    damage: Math.round(PLAYER_JAB_DAMAGE * PLAYER_SPECIAL_DAMAGE_MULTIPLIER),
+    knockbackX: PLAYER_HEAVY_KNOCKBACK_X,
+    knockbackY: PLAYER_HEAVY_KNOCKBACK_Y,
+    hitStunFrames: HEAVY_HIT_STUN_FRAMES,
+    isAoe: true,
+  },
 };
 
 const ATTACK_STATES: ReadonlySet<PlayerState> = new Set([
@@ -103,10 +149,14 @@ export class PlayerController {
   private readonly _stateMachine: PlayerStateMachine;
   private readonly _inputManager: InputManager;
   private readonly _combatBus: CombatBus | null;
+  private readonly _combatSystem: CombatSystem | null;
   private readonly _fixedUpdateBound: (dt: number) => void;
 
   /** Active hitbox rectangle, or null when not in an attack state. */
   private _hitbox: Phaser.GameObjects.Rectangle | null = null;
+
+  /** Ticks remaining for grab invincibility (managed by CombatSystem grab path). */
+  private _grabInvincibilityTicks: number = 0;
 
   /** Ground-plane y position (depth axis); distinct from jump arc offset. */
   private _baseY: number;
@@ -116,10 +166,11 @@ export class PlayerController {
   private _jumpOffsetY: number = 0;
 
   /**
-   * @param scene     The active GameScene instance.
-   * @param x         Initial x position.
-   * @param y         Initial y position (ground-plane depth).
-   * @param combatBus Area-damage dispatcher; pass `null` in unit tests.
+   * @param scene       The active GameScene instance.
+   * @param x           Initial x position.
+   * @param y           Initial y position (ground-plane depth).
+   * @param combatBus   Area-damage dispatcher; pass `null` in unit tests.
+   * @param combatSystem Combat hit-detection engine; pass `null` in unit tests.
    *
    * @spec player-controller – Requirement: PlayerController registers with GameScene fixed-timestep hook
    */
@@ -128,10 +179,12 @@ export class PlayerController {
     x: number,
     y: number,
     combatBus: CombatBus | null = null,
+    combatSystem: CombatSystem | null = null,
   ) {
-    this._scene     = scene;
-    this._combatBus = combatBus;
-    this._baseY     = y;
+    this._scene        = scene;
+    this._combatBus    = combatBus;
+    this._combatSystem = combatSystem;
+    this._baseY        = y;
 
     this.maxHp = GameConfig.PLAYER_MAX_HP;
     this.hp    = this.maxHp;
@@ -157,6 +210,16 @@ export class PlayerController {
     // ── Register fixed-update ───────────────────────────────────────────────
     this._fixedUpdateBound = this.fixedUpdate.bind(this);
     scene.registerFixedUpdate(this._fixedUpdateBound);
+
+    // ── Register hurtbox with CombatSystem ──────────────────────────────────
+    // @spec player-controller – Requirement: PlayerController registers a hurtbox with CombatSystem
+    if (this._combatSystem) {
+      this._combatSystem.registerHurtbox(
+        'player',
+        { x: x - PLAYER_HURTBOX_W / 2, y: y - PLAYER_HURTBOX_H / 2, w: PLAYER_HURTBOX_W, h: PLAYER_HURTBOX_H },
+        'player',
+      );
+    }
 
     // Play initial animation
     this.sprite.play(ASSET_KEY_PLAYER_IDLE, true);
@@ -217,6 +280,8 @@ export class PlayerController {
     this._scene.unregisterFixedUpdate(this._fixedUpdateBound);
     this._hitbox?.destroy();
     this._hitbox = null;
+    // @spec player-controller – Requirement: Player hurtbox removed on destroy
+    this._combatSystem?.removeHurtbox('player');
     this.sprite.off('animationcomplete', this._onAnimComplete, this);
     this.sprite.destroy();
   }
@@ -226,6 +291,21 @@ export class PlayerController {
   private _tickCountdowns(): void {
     if (this.iFramesRemaining > 0)       this.iFramesRemaining--;
     if (this.specialCooldownTicks > 0)   this.specialCooldownTicks--;
+
+    // Tick grab invincibility — clear hurtbox invincible flag when it expires
+    if (this._grabInvincibilityTicks > 0) {
+      this._grabInvincibilityTicks--;
+      if (this._grabInvincibilityTicks === 0 && this._combatSystem) {
+        const hb = this._combatSystem.getHurtbox('player');
+        if (hb) hb.invincible = false;
+      }
+    }
+
+    // Keep hurtbox position in sync with the player sprite
+    if (this._combatSystem) {
+      const hb = this._combatSystem.getHurtbox('player');
+      if (hb) hb.update(this.sprite.x, this.sprite.y);
+    }
   }
 
   /**
@@ -381,7 +461,12 @@ export class PlayerController {
 
     // ── Hitbox ──────────────────────────────────────────────────────────────
     if (ATTACK_STATES.has(state)) {
-      this._spawnHitbox(state);
+      if (state === PlayerState.Grab) {
+        // @spec player-controller – Requirement: Grab attack uses proximity check
+        this._tryGrabAttack();
+      } else {
+        this._spawnHitbox(state);
+      }
     }
   }
 
@@ -390,7 +475,7 @@ export class PlayerController {
    * @spec player-controller – Requirement: Hitbox is removed on state exit
    */
   private _onExitState(state: PlayerState): void {
-    if (ATTACK_STATES.has(state)) {
+    if (ATTACK_STATES.has(state) && state !== PlayerState.Grab) {
       this._destroyHitbox();
     }
   }
@@ -431,8 +516,10 @@ export class PlayerController {
   // ── Private: hitbox helpers ───────────────────────────────────────────────
 
   /**
-   * Spawns a hitbox rectangle in the scene's playerHitboxGroup.
-   * @spec player-controller – Requirement: PlayerController spawns and despawns hitboxes
+   * Spawns a hitbox rectangle in the scene's playerHitboxGroup and
+   * registers it with CombatSystem for overlap detection.
+   *
+   * @spec player-controller – Requirement: PlayerController registers hitboxes with CombatSystem
    */
   private _spawnHitbox(state: PlayerState): void {
     this._destroyHitbox();
@@ -442,12 +529,54 @@ export class PlayerController {
     const { x, y } = this._hitboxPosition(dims);
     this._hitbox = this._scene.playerHitboxGroup.create(x, y, undefined) as Phaser.GameObjects.Rectangle;
     (this._hitbox as unknown as Phaser.Physics.Arcade.Body & { setSize: (w: number, h: number) => void })?.setSize?.(dims.w, dims.h);
+
+    // Register with CombatSystem
+    const combatParams = COMBAT_HITBOX[state];
+    if (this._combatSystem && combatParams) {
+      const hitboxId = `player_hitbox_${state}`;
+      this._combatSystem.registerHitbox(
+        hitboxId,
+        { x: x - dims.w / 2, y: y - dims.h / 2, w: dims.w, h: dims.h },
+        'player',
+        combatParams.damage,
+        combatParams.knockbackX,
+        combatParams.knockbackY,
+        combatParams.hitStunFrames,
+        this.facingRight ? 'right' : 'left',
+        combatParams.isAoe,
+      );
+    }
   }
 
   private _destroyHitbox(): void {
     if (this._hitbox) {
+      // Remove from CombatSystem when hitbox is destroyed
+      if (this._combatSystem) {
+        const state = this._stateMachine.current;
+        const hitboxId = `player_hitbox_${state}`;
+        this._combatSystem.removeHitbox(hitboxId);
+      }
       this._hitbox.destroy();
       this._hitbox = null;
+    }
+  }
+
+  /**
+   * Route grab to CombatSystem proximity check.
+   * On success: grant grab invincibility and let CombatSystem dispatch the HitEvent.
+   *
+   * @spec player-controller – Requirement: Grab attack uses proximity check
+   */
+  private _tryGrabAttack(): void {
+    if (!this._combatSystem) return;
+    const result = this._combatSystem.tryGrab(
+      'player',
+      this.sprite.x,
+      this.sprite.y,
+      this.facingRight ? 'right' : 'left',
+    );
+    if (result) {
+      this._grabInvincibilityTicks = GRAB_INVINCIBILITY_FRAMES;
     }
   }
 
@@ -458,6 +587,17 @@ export class PlayerController {
     if (!dims) return;
     const { x, y } = this._hitboxPosition(dims);
     this._hitbox.setPosition(x, y);
+
+    // Keep CombatSystem hitbox rect in sync
+    if (this._combatSystem) {
+      const hitboxId = `player_hitbox_${state}`;
+      const hx = this._combatSystem.getHitboxes().get(hitboxId);
+      if (hx) {
+        hx.rect.x = x - dims.w / 2;
+        hx.rect.y = y - dims.h / 2;
+        hx.facing = this.facingRight ? 'right' : 'left';
+      }
+    }
   }
 
   private _hitboxPosition(dims: { w: number; h: number; offsetX: number; offsetY: number }): { x: number; y: number } {
