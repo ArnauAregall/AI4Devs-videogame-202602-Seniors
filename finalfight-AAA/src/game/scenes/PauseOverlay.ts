@@ -21,6 +21,10 @@ export class PauseOverlay extends Scene {
     }
 
     create(): void {
+        this._labels = [];
+        this._showingControls = false;
+        this._cursor = 0;
+
         const { width, height } = this.scale;
         const cx = width / 2;
 
@@ -56,7 +60,6 @@ export class PauseOverlay extends Scene {
             align:      'center',
         }).setOrigin(0.5).setVisible(false);
 
-        this._cursor = 0;
         // Defer first _refresh so Phaser's WebGL canvas texture is fully
         // initialised before setColor triggers a redraw (prevents null drawImage crash).
         this.time.delayedCall(0, () => this._refresh());
