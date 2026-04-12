@@ -75,12 +75,12 @@ export class DestructibleProp {
   /** True after destruction begins. */
   get isDead(): boolean { return this._dead; }
 
-  /** World-space hurtbox rect for collision queries. @spec FR-DP-02 */
+  /** Screen-space hurtbox rect for collision queries. Matches the screen-space hitbox system. @spec FR-DP-02 */
   get hurtboxRect(): { x: number; y: number; w: number; h: number } {
     const w = this._sprite.displayWidth || 32;
     const h = this._sprite.displayHeight || 48;
     return {
-      x: this.def.worldX - w / 2,
+      x: this._sprite.x - w / 2,
       y: this.def.worldY - h / 2,
       w,
       h,
