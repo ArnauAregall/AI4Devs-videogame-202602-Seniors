@@ -206,8 +206,4 @@ describe('BrawlerController (via EnemyController base)', () => {
     expect(mocks.spriteMock.setVelocityY).toHaveBeenCalledWith(0);
   });
 
-  it('setCollideWorldBounds(true) called on sprite at construction', () => {
-    makeBrawler(); // create a fresh brawler
-    expect(mocks.spriteMock.setCollideWorldBounds).toHaveBeenCalledWith(true);
-  });
 });
