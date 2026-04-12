@@ -1,18 +1,15 @@
-# Phaser Vite TypeScript Template
+# Final Fight Clone — AAA
 
-This is a Phaser 3 project template that uses Vite for bundling. It supports hot-reloading for quick development workflow, includes TypeScript support and scripts to generate production-ready builds.
+A side-scrolling 2D beat-'em-up inspired by the classic arcade game Final Fight, built with **Phaser 3**, **TypeScript** (strict mode), and **Vite**.
 
-**[This Template is also available as a JavaScript version.](https://github.com/phaserjs/template-vite)**
+## Tech Stack
 
-### Versions
-
-This template has been updated for:
-
-- [Phaser 3.90.0](https://github.com/phaserjs/phaser)
-- [Vite 6.3.1](https://github.com/vitejs/vite)
-- [TypeScript 5.7.2](https://github.com/microsoft/TypeScript)
-
-![screenshot](screenshot.png)
+| Tool | Version |
+|------|---------|
+| [Phaser](https://phaser.io) | 3.90.0 |
+| [Vite](https://vitejs.dev) | 6.3.1 |
+| [TypeScript](https://www.typescriptlang.org) | 5.7.2 |
+| [Vitest](https://vitest.dev) | 4.x |
 
 ## Requirements
 
@@ -23,136 +20,61 @@ This template has been updated for:
 | Command | Description |
 |---------|-------------|
 | `npm install` | Install project dependencies |
-| `npm run dev` | Launch a development web server |
+| `npm run dev` | Launch a development server with hot-reload |
 | `npm run build` | Create a production build in the `dist` folder |
-| `npm run dev-nolog` | Launch a development web server without sending anonymous data (see "About log.js" below) |
-| `npm run build-nolog` | Create a production build in the `dist` folder without sending anonymous data (see "About log.js" below) |
+| `npm test` | Run the test suite once |
+| `npm run test:watch` | Run tests in watch mode |
 
-## Writing Code
-
-After cloning the repo, run `npm install` from your project directory. Then, you can start the local development server by running `npm run dev`.
-
-The local development server runs on `http://localhost:8080` by default. Please see the Vite documentation if you wish to change this, or add SSL support.
-
-Once the server is running you can edit any of the files in the `src` folder. Vite will automatically recompile your code and then reload the browser.
-
-## Template Project Structure
-
-We have provided a default project structure to get you started. This is as follows:
-
-## Template Project Structure
-
-We have provided a default project structure to get you started:
-
-| Path                         | Description                                                |
-|------------------------------|------------------------------------------------------------|
-| `index.html`                 | A basic HTML page to contain the game.                     |
-| `public/assets`              | Game sprites, audio, etc. Served directly at runtime.      |
-| `public/style.css`           | Global layout styles.                                      |
-| `src/main.ts`                | Application bootstrap.                                     |
-| `src/game`                   | Folder containing the game code.                           |
-| `src/game/main.ts`           | Game entry point: configures and starts the game.          |
-| `src/game/scenes`            | Folder with all Phaser game scenes.                        | 
-
-
-## Handling Assets
-
-Vite supports loading assets via JavaScript module `import` statements.
-
-This template provides support for both embedding assets and also loading them from a static folder. To embed an asset, you can import it at the top of the JavaScript file you are using it in:
-
-```js
-import logoImg from './assets/logo.png'
-```
-
-To load static files such as audio files, videos, etc place them into the `public/assets` folder. Then you can use this path in the Loader calls within Phaser:
-
-```js
-preload ()
-{
-    //  This is an example of an imported bundled image.
-    //  Remember to import it at the top of this file
-    this.load.image('logo', logoImg);
-
-    //  This is an example of loading a static image
-    //  from the public/assets folder:
-    this.load.image('background', 'assets/bg.png');
-}
-```
-
-When you issue the `npm run build` command, all static assets are automatically copied to the `dist/assets` folder.
-
-## Deploying to Production
-
-After you run the `npm run build` command, your code will be built into a single bundle and saved to the `dist` folder, along with any other assets your project imported, or stored in the public assets folder.
-
-In order to deploy your game, you will need to upload *all* of the contents of the `dist` folder to a public facing web server.
-
-## Customizing the Template
-
-### Vite
-
-If you want to customize your build, such as adding plugin (i.e. for loading CSS or fonts), you can modify the `vite/config.*.mjs` file for cross-project changes, or you can modify and/or create new configuration files and target them in specific npm tasks inside of `package.json`. Please see the [Vite documentation](https://vitejs.dev/) for more information.
-
-## About log.js
-
-If you inspect our node scripts you will see there is a file called `log.js`. This file makes a single silent API call to a domain called `gryzor.co`. This domain is owned by Phaser Studio Inc. The domain name is a homage to one of our favorite retro games.
-
-We send the following 3 pieces of data to this API: The name of the template being used (vue, react, etc). If the build was 'dev' or 'prod' and finally the version of Phaser being used.
-
-At no point is any personal data collected or sent. We don't know about your project files, device, browser or anything else. Feel free to inspect the `log.js` file to confirm this.
-
-Why do we do this? Because being open source means we have no visible metrics about which of our templates are being used. We work hard to maintain a large and diverse set of templates for Phaser developers and this is our small anonymous way to determine if that work is actually paying off, or not. In short, it helps us ensure we're building the tools for you.
-
-However, if you don't want to send any data, you can use these commands instead:
-
-Dev:
+## Getting Started
 
 ```bash
-npm run dev-nolog
+npm install
+npm run dev
 ```
 
-Build:
+The development server starts at `http://localhost:5173` by default. Vite will hot-reload any change made under `src/`.
+
+## Project Structure
+
+| Path | Description |
+|------|-------------|
+| `index.html` | HTML shell that mounts the Phaser canvas |
+| `public/assets/` | Sprites, audio, and other static assets served at runtime |
+| `src/main.ts` | Application bootstrap |
+| `src/game/main.ts` | Phaser game configuration and scene registration |
+| `src/game/scenes/` | All Phaser scenes (`Boot`, `Preloader`, `MainMenu`, `GameScene`, `HudScene`, `GameOver`, `StageClear`, `TimeUp`, `PauseOverlay`, `LeaderboardScene`) |
+| `src/player/` | Player state machine, controller, and input binding |
+| `src/enemy/` | Enemy controllers (`Brawler`, `Rusher`, `KnifeThrower`, `Boss`), state machine, and manager |
+| `src/combat/` | Hit detection (`CombatSystem`, `HurtboxComponent`), combo tracking, and debug renderer |
+| `src/hud/` | HUD components: health bars, lives display, score, combo counter, timer, boss health bar, special cooldown, leaderboard |
+| `src/stage/` | Stage data, spawn controller, parallax background, destructible props, item pickups, and timer |
+| `src/input/` | `InputManager` and `InputState` abstractions |
+| `src/config/` | Centralised `GameConfig` constants |
+| `src/data/` | Per-stage data files (`stage1Data`, `stage2Data`, `stage3Data`) |
+| `src/assets/` | `AssetKeys` constants for all loaded assets |
+| `src/__tests__/` | Vitest unit tests mirroring the source tree |
+| `requirements/` | Plain-English functional requirements per subsystem |
+| `vite/` | Vite config files for dev and production builds |
+
+## Game Features
+
+- Three playable stages with scrolling parallax backgrounds and destructible props
+- Multiple enemy archetypes: Brawler, Rusher, Knife Thrower, and Boss
+- Full combat system with hitbox/hurtbox detection, combo tracking, and score multipliers
+- Player special attack with cooldown
+- Stage timer and time-up flow
+- HUD: health bars, lives, score, combo counter, special cooldown, boss health bar
+- Pause overlay and leaderboard screen
+- Health item pickups from destructible props
+
+## Production Build
 
 ```bash
-npm run build-nolog
+npm run build
 ```
 
-Or, to disable the log entirely, simply delete the file `log.js` and remove the call to it in the `scripts` section of `package.json`:
+The output is written to `dist/`. Upload the entire contents of that folder to any static web host to deploy the game.
 
-Before:
+## Assets
 
-```json
-"scripts": {
-    "dev": "node log.js dev & dev-template-script",
-    "build": "node log.js build & build-template-script"
-},
-```
-
-After:
-
-```json
-"scripts": {
-    "dev": "dev-template-script",
-    "build": "build-template-script"
-},
-```
-
-Either of these will stop `log.js` from running. If you do decide to do this, please could you at least join our Discord and tell us which template you're using! Or send us a quick email. Either will be super-helpful, thank you.
-
-## Join the Phaser Community!
-
-We love to see what developers like you create with Phaser! It really motivates us to keep improving. So please join our community and show-off your work 😄
-
-**Visit:** The [Phaser website](https://phaser.io) and follow on [Phaser Twitter](https://twitter.com/phaser_)<br />
-**Play:** Some of the amazing games [#madewithphaser](https://twitter.com/search?q=%23madewithphaser&src=typed_query&f=live)<br />
-**Learn:** [API Docs](https://newdocs.phaser.io), [Support Forum](https://phaser.discourse.group/) and [StackOverflow](https://stackoverflow.com/questions/tagged/phaser-framework)<br />
-**Discord:** Join us on [Discord](https://discord.gg/phaser)<br />
-**Code:** 2000+ [Examples](https://labs.phaser.io)<br />
-**Read:** The [Phaser World](https://phaser.io/community/newsletter) Newsletter<br />
-
-Created by [Phaser Studio](mailto:support@phaser.io). Powered by coffee, anime, pixels and love.
-
-The Phaser logo and characters are &copy; 2011 - 2025 Phaser Studio Inc.
-
-All rights reserved.
+Static assets (sprites, audio, etc.) live in `public/assets/` and are served directly by the dev server and copied verbatim into `dist/assets/` on build. Asset key constants are centralised in `src/assets/AssetKeys.ts`.
