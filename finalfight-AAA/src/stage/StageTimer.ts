@@ -9,12 +9,18 @@ import { GameConfig } from '../config/GameConfig';
 import { GameEvents } from '../game/GameEvents';
 import { HUD_TIMER_START_SECONDS } from '../hud/HudConfig';
 
+/** Minimal interface for the hosting scene — avoids coupling to GameScene directly. */
+interface FixedUpdateScene extends Phaser.Scene {
+  registerFixedUpdate(fn: (dt: number) => void): void;
+  unregisterFixedUpdate(fn: (dt: number) => void): void;
+}
+
 export class StageTimer {
   private _ticksRemaining: number;
   private _fired: boolean = false;
   private readonly _fixedUpdateBound: (dt: number) => void;
 
-  constructor(private readonly scene: Phaser.Scene) {
+  constructor(private readonly scene: FixedUpdateScene) {
     this._ticksRemaining = HUD_TIMER_START_SECONDS * GameConfig.TARGET_FPS;
     this._fixedUpdateBound = this._fixedUpdate.bind(this);
     scene.registerFixedUpdate(this._fixedUpdateBound);

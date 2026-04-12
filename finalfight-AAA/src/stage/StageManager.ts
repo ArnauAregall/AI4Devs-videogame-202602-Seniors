@@ -20,6 +20,8 @@ import { GameEvents } from '../game/GameEvents';
 /** Expected shape of GameScene for type-safe access. */
 interface StageScene extends Phaser.Scene {
   getPlayer(): PlayerController | null;
+  registerFixedUpdate(fn: (dt: number) => void): void;
+  unregisterFixedUpdate(fn: (dt: number) => void): void;
 }
 
 export class StageManager {

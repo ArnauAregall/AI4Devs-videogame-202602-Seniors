@@ -124,8 +124,11 @@ export class GameScene extends Scene {
             }
         });
 
-        // Translate stage-clear signal from StageManager.
-        this.events.on(GameEvents.STAGE_CLEARED, (data: { timeBonus: number }) => {
+        // Translate stage-clear signal from StageManager — enrich with score.
+        // Guard prevents re-entrant infinite emit: StageManager emits without `score`,
+        // GameScene re-emits with `score`; the guard skips the already-enriched payload.
+        this.events.on(GameEvents.STAGE_CLEARED, (data: { timeBonus: number; score?: number }) => {
+            if (data.score !== undefined) return;
             this.events.emit(GameEvents.STAGE_CLEARED, { score: this._score, timeBonus: data.timeBonus });
         });
 

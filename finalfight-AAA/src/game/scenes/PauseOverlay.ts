@@ -122,7 +122,7 @@ export class PauseOverlay extends Scene {
         const gameScene = this.scene.get('GameScene');
         gameScene.sound.resumeAll();
         gameScene.events.emit(GameEvents.PAUSE_TOGGLED, { paused: false });
-        this.scene.resume('GameScene');
+        // HudScene's PAUSE_TOGGLED listener owns the scene.resume('GameScene') call.
     }
 
     private _quitToMainMenu(): void {

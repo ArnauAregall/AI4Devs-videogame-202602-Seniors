@@ -82,6 +82,8 @@ export class GameOver extends Scene {
     }
 
     private showLeaderboard(): void {
+        this.scene.stop('GameScene');
+        this.scene.stop('HudScene');
         this.scene.start('LeaderboardScene', { returnScene: 'MainMenuScene' });
     }
 
