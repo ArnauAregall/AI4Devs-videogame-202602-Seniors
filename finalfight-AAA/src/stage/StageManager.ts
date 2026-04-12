@@ -155,6 +155,10 @@ export class StageManager {
     // Freeze all movement by locking
     this._locked = true;
 
+    // Notify the HUD with available time bonus before the scene transition.
+    const timeBonus = this._timer.secondsRemaining * 10;
+    this.scene.events.emit('stageCleared', { timeBonus });
+
     this.scene.cameras.main.fadeOut(GameConfig.STAGE_TRANSITION_FADE_MS);
     this.scene.cameras.main.once('camerafadeoutcomplete', () => {
       if (this.stageIndex < GameConfig.STAGE_COUNT) {

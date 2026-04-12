@@ -6,6 +6,13 @@ import { stage1Data } from '../../data/stage1Data';
 import { CombatSystem } from '../../combat/CombatSystem';
 import { DebugRenderer } from '../../combat/DebugRenderer';
 import { EnemyManager } from '../../enemy/EnemyManager';
+import { GameEvents } from '../GameEvents';
+import {
+  HUD_SCORE_BRAWLER,
+  HUD_SCORE_RUSHER,
+  HUD_SCORE_KNIFE_THROWER,
+  HUD_SCORE_BOSS,
+} from '../../hud/HudConfig';
 
 type FixedUpdateFn = (dt: number) => void;
 
@@ -26,6 +33,19 @@ export class GameScene extends Scene {
     private _enemyManager: EnemyManager | null = null;
 
     private _debugRenderer: DebugRenderer | null = null;
+
+    // ── HUD event tracking ─────────────────────────────────────────────────
+    private _score                 = 0;
+    private _lastHp                = -1;
+    private _lastLives             = -1;
+    private _lastSpecialCooldown   = -1;
+    /** Tracks the enemy-type at spawn time for score calculation on defeat. */
+    private _spawnedTypes: Map<string, string> = new Map();
+    private _bossId:       string | null       = null;
+    private _lastBossHp                        = -1;
+    private _comboCount                        = 0;
+    private _comboWindowTicks                  = 0;
+    private static readonly COMBO_WINDOW_TICKS = 120; // 2 seconds at 60 fps
 
     /** Physics group for all player attack hitboxes. Queried by combat-system. */
     playerHitboxGroup!: Phaser.Physics.Arcade.StaticGroup;
@@ -75,6 +95,52 @@ export class GameScene extends Scene {
 
         // Stage subsystem — initialise after player so StageManager can call getPlayer()
         this._stageManager = new StageManager(this, stage1Data, 1);
+
+        // ── HUD event wiring ────────────────────────────────────────────────
+
+        // Track enemy types at spawn for score lookup on defeat.
+        this.events.on('enemySpawn', (payload: { id: string; type: string }) => {
+            this._spawnedTypes.set(payload.id, payload.type);
+        });
+
+        // Emit SCORE_CHANGED when an enemy is defeated.
+        this.events.on('enemyDefeated', (payload: { id: string }) => {
+            const type = this._spawnedTypes.get(payload.id) ?? '';
+            this._spawnedTypes.delete(payload.id);
+            const delta = this._scoreForType(type);
+            this._score += delta;
+            this.events.emit(GameEvents.SCORE_CHANGED, { score: this._score, delta });
+        });
+
+        // Emit BOSS_ARRIVED and track boss id for HP polling.
+        this.events.on('bossArrived', (id: string) => {
+            this._bossId = id;
+            const boss = this._enemyManager?.getEnemies().get(id);
+            if (boss) {
+                this._lastBossHp = boss.hp;
+                this.events.emit(GameEvents.BOSS_ARRIVED, { maxHealth: boss.maxHp });
+            }
+        });
+
+        // Translate stage-clear signal from StageManager.
+        this.events.on('stageCleared', (data: { timeBonus: number }) => {
+            this.events.emit(GameEvents.STAGE_CLEARED, { score: this._score, timeBonus: data.timeBonus });
+        });
+
+        // Wire combo tracking to CombatSystem hit callbacks.
+        this._combatSystem?.onHit((_targetId, event) => {
+            if (event.teamTag === 'player') {
+                this._comboCount++;
+                this._comboWindowTicks = GameScene.COMBO_WINDOW_TICKS;
+                this.events.emit(GameEvents.COMBO_UPDATED, {
+                    count:        this._comboCount,
+                    windowActive: true,
+                });
+            }
+        });
+
+        // Launch HUD as a parallel scene.
+        this.scene.launch('HudScene');
     }
 
     /** Register a callback to be called once per fixed timestep tick. */
@@ -109,9 +175,53 @@ export class GameScene extends Scene {
 
         // Debug renderer runs every render frame (not fixed tick)
         this._debugRenderer?.update();
+
+        // ── HUD state polling ───────────────────────────────────────────────
+        const player = this._player;
+        if (player) {
+            if (player.hp !== this._lastHp || this._lastHp === -1) {
+                this._lastHp = player.hp;
+                this.events.emit(GameEvents.PLAYER_HEALTH_CHANGED, { current: player.hp, max: player.maxHp });
+            }
+            if (player.lives !== this._lastLives) {
+                this._lastLives = player.lives;
+                this.events.emit(GameEvents.PLAYER_LIVES_CHANGED, { lives: player.lives });
+            }
+            if (player.specialCooldownTicks !== this._lastSpecialCooldown) {
+                this._lastSpecialCooldown = player.specialCooldownTicks;
+                this.events.emit(GameEvents.SPECIAL_COOLDOWN_CHANGED, {
+                    fraction: player.specialCooldownTicks / GameConfig.SPECIAL_COOLDOWN_TICKS,
+                });
+            }
+        }
+
+        // Boss HP polling.
+        if (this._bossId) {
+            const boss = this._enemyManager?.getEnemies().get(this._bossId);
+            if (boss) {
+                if (boss.hp !== this._lastBossHp) {
+                    this._lastBossHp = boss.hp;
+                    this.events.emit(GameEvents.BOSS_HEALTH_CHANGED, { current: boss.hp, max: boss.maxHp });
+                }
+            } else if (this._lastBossHp !== 0) {
+                this._lastBossHp = 0;
+                this.events.emit(GameEvents.BOSS_HEALTH_CHANGED, { current: 0, max: 0 });
+                this._bossId = null;
+            }
+        }
+
+        // Combo window countdown.
+        if (this._comboWindowTicks > 0) {
+            this._comboWindowTicks--;
+            if (this._comboWindowTicks === 0) {
+                this._comboCount = 0;
+                this.events.emit(GameEvents.COMBO_UPDATED, { count: 0, windowActive: false });
+            }
+        }
     }
 
     pauseGame(): void {
+        this.events.emit(GameEvents.PAUSE_TOGGLED, { paused: true });
         this.sound.pauseAll();
         this.scene.pause();
         this.scene.launch('PauseOverlayScene');
@@ -162,7 +272,20 @@ export class GameScene extends Scene {
      * @spec player-health – Requirement: Last life lost triggers Game Over
      */
     triggerGameOver(): void {
+        this.events.emit(GameEvents.GAME_OVER, { score: this._score });
         this.scene.pause();
-        this.scene.launch('GameOverScene');
+        this.scene.launch('GameOverScene', { score: this._score });
+    }
+
+    // ── Private helpers ────────────────────────────────────────────────────
+
+    private _scoreForType(type: string): number {
+        switch (type) {
+            case 'brawler':       return HUD_SCORE_BRAWLER;
+            case 'rusher':        return HUD_SCORE_RUSHER;
+            case 'knife-thrower': return HUD_SCORE_KNIFE_THROWER;
+            case 'boss':          return HUD_SCORE_BOSS;
+            default:              return 0;
+        }
     }
 }

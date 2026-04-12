@@ -31,7 +31,14 @@ export class StageTimer {
   private _fixedUpdate(_dt: number): void {
     if (this._fired) return;
 
+    const prevSeconds = this.secondsRemaining;
     this._ticksRemaining--;
+    const currSeconds = this.secondsRemaining;
+
+    // Emit a tick event once per second so the HUD timer display stays in sync.
+    if (currSeconds !== prevSeconds) {
+      this.scene.events.emit('timerTick', { remaining: currSeconds });
+    }
 
     if (this._ticksRemaining <= 0) {
       this._ticksRemaining = 0;
