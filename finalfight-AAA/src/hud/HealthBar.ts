@@ -8,6 +8,7 @@ import {
   HUD_HEALTH_BAR_X, HUD_HEALTH_BAR_Y, HUD_HEALTH_BAR_WIDTH, HUD_HEALTH_BAR_HEIGHT,
   HUD_HEALTH_GREEN, HUD_HEALTH_YELLOW, HUD_HEALTH_RED,
   HUD_HEALTH_YELLOW_THRESHOLD, HUD_HEALTH_RED_THRESHOLD,
+  HUD_DEPTH,
 } from './HudConfig';
 
 export class HealthBar {
@@ -20,8 +21,8 @@ export class HealthBar {
   constructor(scene: Phaser.Scene, current: number, max: number) {
     this._current = current;
     this._max     = max;
-    this._bg   = scene.add.graphics().setDepth(9999);
-    this._fill = scene.add.graphics().setDepth(9999);
+    this._bg   = scene.add.graphics().setDepth(HUD_DEPTH);
+    this._fill = scene.add.graphics().setDepth(HUD_DEPTH);
     this._redraw();
   }
 

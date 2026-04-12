@@ -8,7 +8,7 @@ import Phaser from 'phaser';
 import {
   HUD_COMBO_X, HUD_COMBO_Y,
   HUD_FONT_FAMILY, HUD_FONT_SIZE_LARGE,
-  HUD_COMBO_MIN_COUNT,
+  HUD_COMBO_MIN_COUNT, HUD_DEPTH,
 } from './HudConfig';
 
 export class ComboCounter {
@@ -23,7 +23,7 @@ export class ComboCounter {
         fontSize:   HUD_FONT_SIZE_LARGE,
         color:      '#ffff00',
       })
-      .setDepth(9999)
+      .setDepth(HUD_DEPTH)
       .setVisible(false);
   }
 

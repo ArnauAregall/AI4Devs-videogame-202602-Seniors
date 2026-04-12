@@ -8,6 +8,7 @@ import Phaser from 'phaser';
 import {
   HUD_BOSS_BAR_Y, HUD_BOSS_BAR_WIDTH, HUD_BOSS_BAR_HEIGHT,
   HUD_HEALTH_GREEN, HUD_HEALTH_YELLOW, HUD_HEALTH_RED,
+  HUD_DEPTH,
   HUD_HEALTH_YELLOW_THRESHOLD, HUD_HEALTH_RED_THRESHOLD,
 } from './HudConfig';
 import { GameConfig } from '../config/GameConfig';
@@ -22,8 +23,8 @@ export class BossHealthBar {
   private _visible: boolean = false;
 
   constructor(scene: Phaser.Scene) {
-    this._bg   = scene.add.graphics().setDepth(9999);
-    this._fill = scene.add.graphics().setDepth(9999);
+    this._bg   = scene.add.graphics().setDepth(HUD_DEPTH);
+    this._fill = scene.add.graphics().setDepth(HUD_DEPTH);
     this._setVisible(false);
   }
 

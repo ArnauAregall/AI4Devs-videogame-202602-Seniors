@@ -7,6 +7,7 @@ import Phaser from 'phaser';
 import {
   HUD_LIVES_X, HUD_LIVES_Y,
   HUD_FONT_FAMILY, HUD_FONT_SIZE_SMALL,
+  HUD_DEPTH,
 } from './HudConfig';
 
 export class LivesDisplay {
@@ -21,7 +22,7 @@ export class LivesDisplay {
         fontSize:   HUD_FONT_SIZE_SMALL,
         color:      '#ffffff',
       })
-      .setDepth(9999);
+      .setDepth(HUD_DEPTH);
   }
 
   /** @spec hud Update lives count. */

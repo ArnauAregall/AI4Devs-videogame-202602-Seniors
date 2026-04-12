@@ -8,10 +8,11 @@ import {
   HUD_TIMER_X, HUD_TIMER_Y,
   HUD_FONT_FAMILY, HUD_FONT_SIZE_NORMAL,
   HUD_TIMER_WARNING_SECONDS, HUD_TIMER_WARNING_COLOUR,
-  HUD_TIMER_START_SECONDS,
+  HUD_TIMER_START_SECONDS, HUD_TIMER_COLOUR_NORMAL,
+  HUD_DEPTH,
 } from './HudConfig';
 
-const COLOUR_NORMAL  = '#ffffff';
+const COLOUR_NORMAL  = HUD_TIMER_COLOUR_NORMAL;
 const COLOUR_WARNING = `#${HUD_TIMER_WARNING_COLOUR.toString(16).padStart(6, '0')}`;
 
 export class TimerDisplay {
@@ -27,7 +28,7 @@ export class TimerDisplay {
         color:      COLOUR_NORMAL,
       })
       .setOrigin(0.5, 0)
-      .setDepth(9999);
+      .setDepth(HUD_DEPTH);
   }
 
   /** @spec hud Update displayed time and warning colour. */

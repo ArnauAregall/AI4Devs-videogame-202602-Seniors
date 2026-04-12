@@ -16,7 +16,7 @@ import { ComboCounter }            from './ComboCounter';
 import { TimerDisplay }            from './TimerDisplay';
 import { SpecialCooldownDisplay }  from './SpecialCooldownDisplay';
 import { LeaderboardStore }        from './LeaderboardStore';
-import { HUD_MAX_CONTINUES }       from './HudConfig';
+import { HUD_LEADERBOARD_NAME_MAX_LENGTH } from './HudConfig';
 import type { GameScene }          from '../game/scenes/GameScene';
 
 export class HudScene extends Scene {
@@ -28,9 +28,6 @@ export class HudScene extends Scene {
   private _timerDisplay!:    TimerDisplay;
   private _specialCooldown!: SpecialCooldownDisplay;
   private _leaderboard!:     LeaderboardStore;
-
-  private _score          = 0;
-  private _continuesUsed  = 0;
 
   constructor() {
     super('HudScene');
@@ -72,7 +69,6 @@ export class HudScene extends Scene {
     });
 
     emitter.on(GameEvents.SCORE_CHANGED, ({ score }: { score: number }) => {
-      this._score = score;
       this._scoreDisplay.update(score);
     });
 
@@ -97,9 +93,10 @@ export class HudScene extends Scene {
       this._timerDisplay.update(remaining);
     });
 
-    emitter.on(GameEvents.STAGE_CLEARED, ({ score, timeBonus }: { score: number; timeBonus: number }) => {
-      this.scene.pause('GameScene');
-      this.scene.launch('StageClearScene', { score, timeBonus });
+    emitter.on(GameEvents.STAGE_CLEARED, (_data: { score: number; timeBonus: number }) => {
+      // StageManager owns the scene transition (fade + restart/gameover).
+      // HudScene only needs to hide components that would be stale after clear.
+      this._bossHealthBar.hide();
     });
 
     emitter.on(GameEvents.GAME_OVER, ({ score }: { score: number }) => {
@@ -119,8 +116,12 @@ export class HudScene extends Scene {
 
   private _checkLeaderboard(score: number): void {
     if (this._leaderboard.qualifiesForTop10(score)) {
-      // Name entry would be triggered here in a full implementation.
-      // For now, add a placeholder entry to maintain the store.
+      const rawName = window.prompt(
+        `🏆 New high score: ${score}!\nEnter your name (max ${HUD_LEADERBOARD_NAME_MAX_LENGTH} chars):`,
+        'AAA',
+      );
+      const name = (rawName ?? 'AAA').slice(0, HUD_LEADERBOARD_NAME_MAX_LENGTH).trim() || 'AAA';
+      this._leaderboard.addEntry(name, score);
     }
   }
 }

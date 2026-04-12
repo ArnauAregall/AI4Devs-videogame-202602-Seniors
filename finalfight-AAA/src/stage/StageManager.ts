@@ -15,6 +15,7 @@ import { SpawnController } from './SpawnController';
 import { DestructibleProp } from './DestructibleProp';
 import { ItemPickup } from './ItemPickup';
 import type { PlayerController } from '../player/PlayerController';
+import { GameEvents } from '../game/GameEvents';
 
 /** Expected shape of GameScene for type-safe access. */
 interface StageScene extends Phaser.Scene {
@@ -157,7 +158,7 @@ export class StageManager {
 
     // Notify the HUD with available time bonus before the scene transition.
     const timeBonus = this._timer.secondsRemaining * 10;
-    this.scene.events.emit('stageCleared', { timeBonus });
+    this.scene.events.emit(GameEvents.STAGE_CLEARED, { timeBonus });
 
     this.scene.cameras.main.fadeOut(GameConfig.STAGE_TRANSITION_FADE_MS);
     this.scene.cameras.main.once('camerafadeoutcomplete', () => {

@@ -17,6 +17,7 @@ export const HUD_HEALTH_RED_THRESHOLD    = 0.25;
 // ── Timer ────────────────────────────────────────────────────────────────────
 export const HUD_TIMER_WARNING_SECONDS = 30;
 export const HUD_TIMER_WARNING_COLOUR  = 0xff2222;
+export const HUD_TIMER_COLOUR_NORMAL   = '#ffffff';
 export const HUD_TIMER_START_SECONDS   = 180;
 
 // ── Boss bar ─────────────────────────────────────────────────────────────────
@@ -67,3 +68,11 @@ export const HUD_SCORE_BRAWLER       = 100;
 export const HUD_SCORE_RUSHER        = 150;
 export const HUD_SCORE_KNIFE_THROWER = 200;
 export const HUD_SCORE_BOSS          = 1000;
+
+// ── Render depth ─────────────────────────────────────────────────────────────
+/** All HUD objects render above every game layer at this depth. */
+export const HUD_DEPTH = 9999;
+
+// ── Special cooldown colours ─────────────────────────────────────────────────
+export const HUD_SPECIAL_COLOUR_READY    = 0x22aaff;
+export const HUD_SPECIAL_COLOUR_CHARGING = 0x336688;

@@ -7,6 +7,7 @@ import Phaser from 'phaser';
 import {
   HUD_SCORE_X, HUD_SCORE_Y,
   HUD_FONT_FAMILY, HUD_FONT_SIZE_NORMAL,
+  HUD_DEPTH,
 } from './HudConfig';
 
 export class ScoreDisplay {
@@ -21,7 +22,7 @@ export class ScoreDisplay {
         color:      '#ffffff',
       })
       .setOrigin(1, 0)
-      .setDepth(9999);
+      .setDepth(HUD_DEPTH);
   }
 
   /** @spec hud Update displayed score. */

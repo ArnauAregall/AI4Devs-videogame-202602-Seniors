@@ -12,6 +12,7 @@ import {
   HUD_SCORE_RUSHER,
   HUD_SCORE_KNIFE_THROWER,
   HUD_SCORE_BOSS,
+  HUD_MAX_CONTINUES,
 } from '../../hud/HudConfig';
 
 type FixedUpdateFn = (dt: number) => void;
@@ -36,6 +37,7 @@ export class GameScene extends Scene {
 
     // ── HUD event tracking ─────────────────────────────────────────────────
     private _score                 = 0;
+    private _continuesUsed         = 0;
     private _lastHp                = -1;
     private _lastLives             = -1;
     private _lastSpecialCooldown   = -1;
@@ -123,7 +125,7 @@ export class GameScene extends Scene {
         });
 
         // Translate stage-clear signal from StageManager.
-        this.events.on('stageCleared', (data: { timeBonus: number }) => {
+        this.events.on(GameEvents.STAGE_CLEARED, (data: { timeBonus: number }) => {
             this.events.emit(GameEvents.STAGE_CLEARED, { score: this._score, timeBonus: data.timeBonus });
         });
 
@@ -221,14 +223,13 @@ export class GameScene extends Scene {
     }
 
     pauseGame(): void {
-        this.events.emit(GameEvents.PAUSE_TOGGLED, { paused: true });
         this.sound.pauseAll();
-        this.scene.pause();
-        this.scene.launch('PauseOverlayScene');
+        this.events.emit(GameEvents.PAUSE_TOGGLED, { paused: true });
     }
 
     /** Triggered by GameOverScene when the player uses a continue. */
     resumeAfterContinue(): void {
+        this._continuesUsed++;
         this._accumulator = 0;
         this.scene.resume();
         this.sound.resumeAll();
@@ -272,9 +273,10 @@ export class GameScene extends Scene {
      * @spec player-health – Requirement: Last life lost triggers Game Over
      */
     triggerGameOver(): void {
+        const continuesLeft = HUD_MAX_CONTINUES - this._continuesUsed;
         this.events.emit(GameEvents.GAME_OVER, { score: this._score });
         this.scene.pause();
-        this.scene.launch('GameOverScene', { score: this._score });
+        this.scene.launch('GameOverScene', { score: this._score, continuesLeft });
     }
 
     // ── Private helpers ────────────────────────────────────────────────────

@@ -6,6 +6,8 @@
 // ============================================================
 import Phaser from 'phaser';
 import { GameConfig } from '../config/GameConfig';
+import { GameEvents } from '../game/GameEvents';
+import { HUD_TIMER_START_SECONDS } from '../hud/HudConfig';
 
 export class StageTimer {
   private _ticksRemaining: number;
@@ -13,7 +15,7 @@ export class StageTimer {
   private readonly _fixedUpdateBound: (dt: number) => void;
 
   constructor(private readonly scene: Phaser.Scene) {
-    this._ticksRemaining = 180 * GameConfig.TARGET_FPS;
+    this._ticksRemaining = HUD_TIMER_START_SECONDS * GameConfig.TARGET_FPS;
     this._fixedUpdateBound = this._fixedUpdate.bind(this);
     scene.registerFixedUpdate(this._fixedUpdateBound);
   }
@@ -37,7 +39,7 @@ export class StageTimer {
 
     // Emit a tick event once per second so the HUD timer display stays in sync.
     if (currSeconds !== prevSeconds) {
-      this.scene.events.emit('timerTick', { remaining: currSeconds });
+      this.scene.events.emit(GameEvents.TIMER_TICK, { remaining: currSeconds });
     }
 
     if (this._ticksRemaining <= 0) {

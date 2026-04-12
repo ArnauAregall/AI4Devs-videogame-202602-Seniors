@@ -9,6 +9,7 @@ import { GameOver } from './scenes/GameOver';
 import { StageClear } from './scenes/StageClear';
 import { TimeUp } from './scenes/TimeUp';
 import { HudScene } from '../hud/HudScene';
+import { LeaderboardScene } from './scenes/LeaderboardScene';
 
 const StartGame = (parent: string) => {
     return new Game({
@@ -24,6 +25,7 @@ const StartGame = (parent: string) => {
             GameOver,
             StageClear,
             TimeUp,
+            LeaderboardScene,
         ],
     });
 };

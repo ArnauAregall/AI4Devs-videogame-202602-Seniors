@@ -8,10 +8,9 @@ import Phaser from 'phaser';
 import {
   HUD_SPECIAL_X, HUD_SPECIAL_Y,
   HUD_SPECIAL_WIDTH, HUD_SPECIAL_HEIGHT,
+  HUD_SPECIAL_COLOUR_READY, HUD_SPECIAL_COLOUR_CHARGING,
+  HUD_DEPTH,
 } from './HudConfig';
-
-const COLOUR_READY    = 0x22aaff;
-const COLOUR_CHARGING = 0x336688;
 
 export class SpecialCooldownDisplay {
   private readonly _bg:   Phaser.GameObjects.Graphics;
@@ -19,8 +18,8 @@ export class SpecialCooldownDisplay {
   private _fraction = 0;
 
   constructor(scene: Phaser.Scene) {
-    this._bg   = scene.add.graphics().setDepth(9999);
-    this._fill = scene.add.graphics().setDepth(9999);
+    this._bg   = scene.add.graphics().setDepth(HUD_DEPTH);
+    this._fill = scene.add.graphics().setDepth(HUD_DEPTH);
     this._redraw();
   }
 
@@ -35,7 +34,7 @@ export class SpecialCooldownDisplay {
 
   private _redraw(): void {
     const fillWidth = Math.round(HUD_SPECIAL_WIDTH * (1 - this._fraction));
-    const colour    = this._fraction === 0 ? COLOUR_READY : COLOUR_CHARGING;
+    const colour    = this._fraction === 0 ? HUD_SPECIAL_COLOUR_READY : HUD_SPECIAL_COLOUR_CHARGING;
 
     this._bg.clear();
     this._bg.fillStyle(0x000000, 0.7);
