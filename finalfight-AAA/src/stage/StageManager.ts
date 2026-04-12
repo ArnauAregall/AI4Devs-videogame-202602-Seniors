@@ -15,11 +15,15 @@ import { SpawnController } from './SpawnController';
 import { DestructibleProp } from './DestructibleProp';
 import { ItemPickup } from './ItemPickup';
 import type { PlayerController } from '../player/PlayerController';
+import type { EnemyController } from '../enemy/EnemyController';
+import type { CombatSystem } from '../combat/CombatSystem';
 import { GameEvents } from '../game/GameEvents';
 
 /** Expected shape of GameScene for type-safe access. */
 interface StageScene extends Phaser.Scene {
   getPlayer(): PlayerController | null;
+  getEnemies(): ReadonlyMap<string, EnemyController>;
+  getCombatSystem(): CombatSystem | null;
   registerFixedUpdate(fn: (dt: number) => void): void;
   unregisterFixedUpdate(fn: (dt: number) => void): void;
 }
@@ -125,6 +129,17 @@ export class StageManager {
         this._startStageClear();
       }
     }
+
+    // Enemy hitboxes vs props — uses CombatSystem hit-guard for once-per-swing. @spec FR-HI-08
+    const cs = this.scene.getCombatSystem();
+    if (cs) {
+      for (let i = 0; i < this._props.length; i++) {
+        const prop = this._props[i];
+        if (prop.isDead) continue;
+        const damage = cs.queryEnemyHitboxesVsProp(`${i}`, prop.hurtboxRect);
+        if (damage > 0) prop.hit(damage);
+      }
+    }
   }
 
   private _checkTriggers(): void {
@@ -176,6 +191,8 @@ export class StageManager {
 
   private _spawnItem(type: ItemType, worldX: number, worldY: number): void {
     if (!type) return;
+    // Health drops use no timer (FR-HI-14); other item types keep the default 15s timer.
+    const despawnTicks = type === 'health' ? null : GameConfig.ITEM_DESPAWN_TICKS;
     const pickup = new ItemPickup(
       this.scene,
       type,
@@ -183,6 +200,8 @@ export class StageManager {
       worldY,
       () => this._cameraX,
       () => this.scene.getPlayer(),
+      () => this.scene.getEnemies(),
+      despawnTicks,
     );
     this._pickups.push(pickup);
   }

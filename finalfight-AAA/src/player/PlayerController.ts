@@ -145,6 +145,9 @@ export class PlayerController {
   /** The physics sprite managed by this controller. */
   readonly sprite: Phaser.Physics.Arcade.Sprite;
 
+  /** Current state machine state. */
+  get state(): PlayerState { return this._stateMachine.current; }
+
   // ── Private ───────────────────────────────────────────────────────────────
   private readonly _scene: GameSceneRef;
   private readonly _stateMachine: PlayerStateMachine;

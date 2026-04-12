@@ -20,6 +20,8 @@ const mocks = vi.hoisted(() => {
   const playerMock = {
     sprite: playerSpriteMock,
     heal: vi.fn(),
+    iFramesRemaining: 0,
+    state: 'Idle',
   };
 
   const sceneMock = {
@@ -80,6 +82,7 @@ describe('ItemPickup', () => {
       145,
       () => cameraX,
       () => mocks.playerMock as unknown as PlayerController,
+      () => new Map(),
     );
   };
 

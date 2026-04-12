@@ -188,6 +188,29 @@ export class CombatSystem {
     this._dispatch(targetId, event);
   }
 
+  /**
+   * Check all active enemy hitboxes against a prop rect.
+   * Uses the same per-swing hit-guard as entity-vs-entity overlap, so a single
+   * attack swing can only hit a given prop once. @spec FR-HI-08
+   *
+   * @param propId  Stable identifier for the prop (e.g. `prop-0`).
+   * @param rect    World-space rect of the prop's damageable area.
+   * @returns Total damage from all overlapping enemy hitboxes this tick (0 if none).
+   */
+  queryEnemyHitboxesVsProp(propId: string, rect: HurtboxRect): number {
+    let totalDamage = 0;
+    for (const hx of this._hitboxes.values()) {
+      if (hx.teamTag !== 'enemy') continue;
+      const guardKey = `${hx.id}::prop-${propId}`;
+      if (this._hitGuard.has(guardKey)) continue;
+      if (this._rectsOverlap(hx.rect, rect)) {
+        this._hitGuard.add(guardKey);
+        totalDamage += hx.damage;
+      }
+    }
+    return totalDamage;
+  }
+
   // ── Private ───────────────────────────────────────────────────────────────
 
   private _resolveOverlaps(): void {

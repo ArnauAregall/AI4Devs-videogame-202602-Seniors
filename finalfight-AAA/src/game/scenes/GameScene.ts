@@ -275,6 +275,11 @@ export class GameScene extends Scene {
         return this._enemyManager;
     }
 
+    /** Returns the live enemy map for StageManager (item pickup wiring). */
+    getEnemies(): ReadonlyMap<string, import('../../enemy/EnemyController').EnemyController> {
+        return this._enemyManager?.getEnemies() ?? new Map();
+    }
+
     /**
      * Pause the game scene and launch the Game Over screen.
      * Called by PlayerController when the player exhausts all lives.

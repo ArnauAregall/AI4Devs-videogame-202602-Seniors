@@ -62,6 +62,8 @@ const mocks = vi.hoisted(() => {
       }),
     },
     getPlayer: vi.fn(() => playerMock),
+    getEnemies: vi.fn(() => new Map()),
+    getCombatSystem: vi.fn(() => null),
   };
 
   return { sceneMock, cameraMain, playerMock, playerSpriteMock, fadeOutCallbacks, timerCallbacks, tileSpriteInstances };

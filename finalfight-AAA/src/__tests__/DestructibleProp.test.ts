@@ -150,7 +150,10 @@ describe('DestructibleProp', () => {
     // Invoke the delayed callback (simulates the timer firing)
     const timerEvent = mocks.timeCallbacks[0];
     timerEvent.callback.call(timerEvent.callbackScope ?? prop);
-    expect(spawnCallback).toHaveBeenCalledWith('health', BARREL_DEF.worldX, BARREL_DEF.worldY);
+    // Multi-drop: 1–3 items are spawned; check type and Y; X has scatter offset
+    expect(spawnCallback).toHaveBeenCalledWith('health', expect.any(Number), BARREL_DEF.worldY);
+    expect(spawnCallback.mock.calls.length).toBeGreaterThanOrEqual(1);
+    expect(spawnCallback.mock.calls.length).toBeLessThanOrEqual(3);
   });
 
   it('does NOT spawn item when dropItemType is null', () => {

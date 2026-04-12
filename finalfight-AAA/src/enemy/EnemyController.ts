@@ -90,6 +90,15 @@ export abstract class EnemyController {
   get state():   EnemyState { return this._fsm.state; }
   get sprite():  Phaser.Physics.Arcade.Sprite { return this._sprite; }
 
+  /**
+   * Restore HP by amount, capped at maxHp. No-op if dead.
+   * Health bar updates on the next fixedUpdate tick. @spec FR-HI-30, FR-HI-32
+   */
+  heal(amount: number): void {
+    if (this._dead) return;
+    this._hp = Math.min(this._maxHp, this._hp + amount);
+  }
+
   constructor(cfg: EnemyControllerConfig) {
     this._scene           = cfg.scene;
     this._id              = cfg.id;

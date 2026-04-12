@@ -48,14 +48,26 @@ export const GameConfig = {
   // ── Stage ────────────────────────────────────────────────────
   /** Off-screen margin (px) used when placing enemy spawn X. @spec FR-SZ-02 */
   SPAWN_OFFSCREEN_MARGIN: 64,
-  /** Fixed ticks before an uncollected item auto-despawns (15 s × 60 fps). @spec FR-IP-02 */
+  /** Fixed ticks before an uncollected item auto-despawns (15 s × 60 fps). Pass null to ItemPickup to disable. @spec FR-IP-02 */
   ITEM_DESPAWN_TICKS: 900,
-  /** HP restored when a health pickup is collected. @spec FR-IP-01 */
-  ITEM_HEALTH_RESTORE_AMOUNT: 30,
+  /** HP restored when a health pickup is collected. @spec FR-IP-01, FR-HI-30 */
+  ITEM_HEALTH_RESTORE_AMOUNT: 25,
   /** Hit-points of a barrel prop. @spec FR-DP-01 */
   PROP_BARREL_HP: 3,
   /** Hit-points of a crate prop. @spec FR-DP-01 */
   PROP_CRATE_HP: 2,
+  /** Tint applied to the barrel healthy sprite after the first hit. @spec barrel-damage-states */
+  BARREL_DAMAGED_TINT: 0xffaa88,
+  /** Tint applied to the barrel crushed sprite. @spec barrel-damage-states, FR-DP-05 */
+  BARREL_CRUSHED_TINT: 0x888888,
+  /** Minimum number of sushi items dropped when a barrel is destroyed. @spec health-item-drop */
+  ITEM_DROP_COUNT_MIN: 1,
+  /** Maximum number of sushi items dropped when a barrel is destroyed. @spec health-item-drop */
+  ITEM_DROP_COUNT_MAX: 3,
+  /** Max scatter radius (px) for item drops around the barrel position. @spec health-item-drop */
+  ITEM_DROP_SCATTER_RADIUS: 48,
+  /** Minimum X spacing (px) between items dropped from the same barrel. @spec health-item-drop */
+  ITEM_DROP_MIN_SPACING: 24,
   /** Duration (ms) of the fade-to-black transition between stages. @spec FR-SM-04 */
   STAGE_TRANSITION_FADE_MS: 500,
   /** Half-width (px) of the player body used for boundary clamping. @spec FR-SM-05 */
