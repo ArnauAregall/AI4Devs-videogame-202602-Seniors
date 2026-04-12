@@ -9,7 +9,6 @@ import Phaser from 'phaser';
 import {
   ASSET_KEY_PROP_BARREL,
 } from '../assets/AssetKeys';
-import { GameConfig } from '../config/GameConfig';
 import type { PropDef, ItemType } from './StageData';
 
 export type SpawnItemCallback = (type: ItemType, worldX: number, worldY: number) => void;
@@ -45,6 +44,7 @@ export class DestructibleProp {
 
     this._sprite = scene.add.image(screenX, def.worldY, textureKey);
     this._sprite.setDepth(6);
+    this._sprite.setFrame(0); // frame 0 = intact state
 
     this._fixedUpdateBound = this._fixedUpdate.bind(this);
     scene.registerFixedUpdate(this._fixedUpdateBound);
@@ -101,8 +101,8 @@ export class DestructibleProp {
     this._dead = true;
     this.scene.unregisterFixedUpdate(this._fixedUpdateBound);
 
-    // Apply crushed tint before the linger delay. @spec barrel-damage-states
-    this._sprite.setTint(GameConfig.BARREL_CRUSHED_TINT);
+    // Apply crushed frame before the linger delay. @spec barrel-damage-states
+    this._sprite.setFrame(1); // frame 1 = crushed state
 
     this.scene.time.addEvent({
       delay: CRUSHED_LINGER_MS,

@@ -13,6 +13,7 @@ const mocks = vi.hoisted(() => {
     active: true,
     setDepth: vi.fn(),
     setTint: vi.fn(),
+    setFrame: vi.fn(),
     setVisible: vi.fn(),
     destroy: vi.fn(function (this: { active: boolean }) { this.active = false; }),
   };
@@ -149,9 +150,13 @@ describe('DestructibleProp', () => {
     expect(prop.isDead).toBe(true);
   });
 
-  it('applies crushed tint to sprite on final hit', () => {
+  it('sets frame 0 (intact) on creation', () => {
+    expect(mocks.spriteMock.setFrame).toHaveBeenCalledWith(0);
+  });
+
+  it('applies crushed frame (1) to sprite on final hit', () => {
     hitTimes(prop, BARREL_DEF.hp);
-    expect(mocks.spriteMock.setTint).toHaveBeenCalledWith(GameConfig.BARREL_CRUSHED_TINT);
+    expect(mocks.spriteMock.setFrame).toHaveBeenCalledWith(1);
   });
 
   it('schedules time.addEvent on destruction (crushed linger delay)', () => {

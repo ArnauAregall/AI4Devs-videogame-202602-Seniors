@@ -198,9 +198,25 @@ export class CombatSystem {
    * @returns Total damage from all overlapping enemy hitboxes this tick (0 if none).
    */
   queryEnemyHitboxesVsProp(propId: string, rect: HurtboxRect): number {
+    return this._queryTeamHitboxesVsProp('enemy', propId, rect);
+  }
+
+  /**
+   * Check all active player hitboxes against a prop rect.
+   * Uses the same per-swing hit-guard, so a single attack swing can only hit a given prop once.
+   *
+   * @param propId  Stable identifier for the prop (e.g. `prop-0`).
+   * @param rect    World-space rect of the prop's damageable area.
+   * @returns Total damage from all overlapping player hitboxes this tick (0 if none).
+   */
+  queryPlayerHitboxesVsProp(propId: string, rect: HurtboxRect): number {
+    return this._queryTeamHitboxesVsProp('player', propId, rect);
+  }
+
+  private _queryTeamHitboxesVsProp(teamTag: string, propId: string, rect: HurtboxRect): number {
     let totalDamage = 0;
     for (const hx of this._hitboxes.values()) {
-      if (hx.teamTag !== 'enemy') continue;
+      if (hx.teamTag !== teamTag) continue;
       const guardKey = `${hx.id}::prop-${propId}`;
       if (this._hitGuard.has(guardKey)) continue;
       if (this._rectsOverlap(hx.rect, rect)) {

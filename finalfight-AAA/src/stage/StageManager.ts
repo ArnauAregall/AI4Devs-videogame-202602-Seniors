@@ -130,13 +130,15 @@ export class StageManager {
       }
     }
 
-    // Enemy hitboxes vs props — uses CombatSystem hit-guard for once-per-swing. @spec FR-HI-08
+    // Player and enemy hitboxes vs props — uses hit-guard for once-per-swing. @spec FR-HI-08
     const cs = this.scene.getCombatSystem();
     if (cs) {
       for (let i = 0; i < this._props.length; i++) {
         const prop = this._props[i];
         if (prop.isDead) continue;
-        const damage = cs.queryEnemyHitboxesVsProp(`${i}`, prop.hurtboxRect);
+        const propId = `${i}`;
+        const rect = prop.hurtboxRect;
+        const damage = cs.queryPlayerHitboxesVsProp(propId, rect) + cs.queryEnemyHitboxesVsProp(propId, rect);
         if (damage > 0) prop.hit(damage);
       }
     }

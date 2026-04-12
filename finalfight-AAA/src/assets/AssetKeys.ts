@@ -238,4 +238,6 @@ export const ASSET_FRAME_CONFIG: Readonly<Record<string, FrameConfig>> = {
   [ASSET_KEY_BOSS_DEATH]:    { frameWidth: 160, frameHeight: 128 }, //  8 frames (1280÷160)
   // Cyberpunk decorations — 336×160 tileset; frame size TBD after visual inspection
   [ASSET_KEY_CYBERPUNK_DECORATIONS]: { frameWidth: 16, frameHeight: 16 }, // TODO: verify
+  // Props — barrel spritesheet: frame 0 = intact, frame 1 = crushed (64×48, 2 frames of 32×48)
+  [ASSET_KEY_PROP_BARREL]: { frameWidth: 32, frameHeight: 48 }, // 2 frames
 };
