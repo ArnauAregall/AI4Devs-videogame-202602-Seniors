@@ -37,6 +37,7 @@
 | `phaser-implementer` | `.ai-specs/skills/phaser-implementer/SKILL.md` | "implement", "code this feature", "write the Phaser scene" |
 | `game-qa` | `.ai-specs/skills/game-qa/SKILL.md` | "write tests for", "test this mechanic", "qa coverage" |
 | `sprite-provisioner` | `.ai-specs/skills/sprite-provisioner/SKILL.md` | "provision sprites", "copy assets", "set up assets for", "prepare sprites for [subsystem]" — invoke before any implementer-agent session that requires sprites for the target subsystem |
+| `orchestrator` | `.ai-specs/skills/orchestrator/SKILL.md` | `/orchestrator @finalfight-AAA/requirements/[subsystem].md` — invoke once per subsystem, in build order, with all dependencies archived first |
 
 ---
 
