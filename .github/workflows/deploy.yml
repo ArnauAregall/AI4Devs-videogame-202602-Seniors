@@ -30,7 +30,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: finalfight-AAA
-        run: npm ci
+        run: npm install
 
       - name: Run tests
         working-directory: finalfight-AAA
