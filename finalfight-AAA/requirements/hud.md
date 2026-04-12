@@ -20,8 +20,17 @@ FR-HU-11: The game over screen must display the text "GAME OVER", the player's f
 FR-HU-12: The stage clear screen must display the text "STAGE CLEAR", the player's score for the completed stage, and a time bonus if a time limit is in use.
 FR-HU-13: The pause menu must display "PAUSED", and provide options to resume, view controls, or quit to the main menu.
 FR-HU-14: All HUD elements must be rendered on a fixed overlay layer that does not scroll with the stage camera.
-FR-HU-15: In two-player mode, the HUD must display separate health bars and lives counters for both players simultaneously without overlapping.
+FR-HU-15: Two-player mode is out of scope for the initial release; the HUD is designed for a single player only.
 FR-HU-16: All HUD text must use a font and size that remains legible at the target canvas resolution without anti-aliasing artefacts.
+FR-HU-17: The HUD must display a countdown timer showing the remaining stage time, starting at 3 minutes (180 seconds) and counting down to zero in whole seconds.
+FR-HU-18: The countdown timer must change colour when 30 seconds or fewer remain, using a defined warning colour (e.g. red), to alert the player.
+FR-HU-19: The player has a maximum of 3 continues per game session; the "Continue" option on the game over screen must be hidden once all continues are exhausted.
+FR-HU-20: The HUD must display the Special Attack cooldown state; when the cooldown is active, a visual indicator must show the remaining cooldown time.
+FR-HU-21: The combo counter must display the hit count only, not the damage total.
+FR-HU-22: The pause menu must support both keyboard navigation and gamepad navigation using the same directional and confirm inputs.
+FR-HU-23: The game must display a high score leaderboard screen accessible from the Main Menu and from the game over screen; it must show the top 10 scores with player name and score value.
+FR-HU-24: When a player completes the game or loses their last life and achieves a score that places in the top 10, the game must prompt them to enter their name (up to 10 characters) before displaying the leaderboard.
+FR-HU-25: The leaderboard data must be persisted in the browser's local storage so scores survive page reloads.
 
 ## Non-Functional Requirements
 
@@ -30,10 +39,3 @@ NFR-HU-02: The game over and stage clear screens must be reachable from every ga
 NFR-HU-03: All HUD colour values, font sizes, and layout positions must be defined as named constants to facilitate visual tuning without code changes.
 NFR-HU-04: The HUD must remain fully legible (no overlapping elements) at both the minimum supported canvas width and the maximum supported canvas width.
 
-## Open Questions
-
-- Is there a time limit per stage? If so, must the HUD display a countdown timer?
-- Are continues limited in number, or unlimited?
-- Should the combo counter display the damage total of the combo, or only the hit count?
-- Is there a high score leaderboard, and if so, does the game over screen provide a score entry prompt?
-- Should the pause menu support controller navigation in addition to keyboard navigation?

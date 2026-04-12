@@ -20,6 +20,10 @@ FR-GL-11: The game must define a Stage Clear state that is triggered when the st
 FR-GL-12: The game configuration must specify the canvas dimensions (width and height in pixels) as named constants, not hardcoded values.
 FR-GL-13: The game configuration must enable Arcade Physics with a gravity value of zero by default, since beat-'em-up movement is not gravity-driven.
 FR-GL-14: The game must support running in both a fixed-size canvas and a responsive canvas that scales to fit the browser window while maintaining the original aspect ratio.
+FR-GL-15: The game must support exactly three stages; after the Stage Clear sequence of stage 3, the game transitions to an end screen instead of another stage.
+FR-GL-16: The game must define a Time Up state triggered when the stage countdown timer reaches zero; this state halts gameplay and transitions to the continue prompt if the player has continues remaining, or to Game Over if no continues are available.
+FR-GL-17: The game must define a Main Menu scene as a fully separate scene from Boot and Preload; it is the first interactive scene the player sees after all assets are loaded.
+FR-GL-18: Stage transitions must be direct with no intermediate stage select screen; the game moves from one stage to the next automatically after the Stage Clear sequence completes.
 
 ## Non-Functional Requirements
 
@@ -31,6 +35,3 @@ NFR-GL-04: The game loop must not accumulate time debt — if the maximum update
 ## Open Questions
 
 - What is the maximum number of fixed-timestep update steps allowed per rendered frame before surplus time is discarded?
-- Should the game support a variable target frame rate (e.g. 30 fps for low-end devices) or always target 60 fps?
-- Should the Main Menu be a separate scene or part of the Boot/Preload flow?
-- Is there a Stage Select screen between stages, or does the game transition directly?

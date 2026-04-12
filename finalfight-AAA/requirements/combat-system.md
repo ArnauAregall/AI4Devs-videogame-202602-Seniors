@@ -23,6 +23,10 @@ FR-CS-14: A single attack may only register one hit per active-frame window — 
 FR-CS-15: The player's grab attack, when it connects, must bypass the enemy's hurtbox overlap check and instead use a proximity range check; once initiated, the grab sequence cannot be interrupted by enemy attacks.
 FR-CS-16: All hitbox and hurtbox dimensions must be defined as named constants, not inline pixel values.
 FR-CS-17: Hitboxes must be visualisable in a debug mode — when debug rendering is enabled, all active hitboxes and hurtboxes must be drawn as coloured overlays on screen.
+FR-CS-18: Combo hits deal diminishing damage returns: the second hit in a combo deals 10% less than the base damage, the third 20% less, the fourth 30% less, and so on, with the reduction capped at a defined minimum damage floor (minimum 1 point of damage per hit).
+FR-CS-19: Hit stun duration scales with combo count: each successive hit within an active combo adds a defined increment of frames to the base hit stun for that attack, making enemies harder to escape from as the combo grows.
+FR-CS-20: The player's grab attack deals its damage at the moment of the throw impact; there is no separate on-grab damage event.
+FR-CS-21: The player's Special Attack hitbox is an area-of-effect that can hit all enemies currently within its bounds simultaneously; each enemy takes one hit from the Special Attack per use.
 
 ## Non-Functional Requirements
 
@@ -33,8 +37,4 @@ NFR-CS-04: Debug hitbox rendering must be toggleable at runtime without reloadin
 
 ## Open Questions
 
-- Should there be a damage scaling system where successive hits in a long combo deal reduced damage (diminishing returns)?
 - Is there a maximum combo window time (e.g. 500 ms) or is it purely frame-count based?
-- Should hit stun duration scale with combo count (i.e. enemies become combo-resistant after a certain number of hits)?
-- Should the grab attack have its own damage value separate from the throw's knockback damage, or is the throw's impact the only damage event?
-- Are there any attacks that deal area-of-effect damage (hitting multiple enemies simultaneously with one hitbox)?

@@ -18,9 +18,14 @@ FR-ST-09: The stage must contain at least two types of destructible props (e.g. 
 FR-ST-10: When a destructible prop is destroyed, it must play a destruction animation and optionally reveal an item pickup that the player can collect.
 FR-ST-11: The stage clear condition is met when the player has defeated all enemies in all spawn zones within the stage and has reached the end of the stage's horizontal extent.
 FR-ST-12: When the stage clear condition is met, the camera must stop scrolling, the stage clear sequence must play, and the game must transition to the next stage or to the end screen if no further stages exist.
-FR-ST-13: Stage data (scroll trigger positions, spawn zone definitions, parallax layer speeds, prop positions) must be defined in a data file or configuration object, not hardcoded inside scene logic.
+FR-ST-13: Stage data (scroll trigger positions, spawn zone definitions, parallax layer speeds, prop positions) must be defined as TypeScript constant objects exported from dedicated stage data files, not hardcoded inside scene logic.
 FR-ST-14: The stage must define left and right boundary walls that neither the player nor enemies may pass through.
 FR-ST-15: If the player walks into an item pickup on the ground plane, the item must be collected immediately and its effect applied.
+FR-ST-16: The initial release includes exactly three stages; the game transitions to the end screen after stage 3 is cleared.
+FR-ST-17: Each stage has a countdown timer starting at 3 minutes (180 seconds); when it reaches zero the game transitions to the Time Up state.
+FR-ST-18: Item pickups that are not collected within 15 seconds of appearing on the ground plane despawn automatically with a brief disappear animation.
+FR-ST-19: Stage transitions after the Stage Clear sequence are direct with no stage select screen or intermediate menu.
+FR-ST-20: Stage transitions must use a fade-to-black animation before loading the next stage.
 
 ## Non-Functional Requirements
 
@@ -31,9 +36,4 @@ NFR-ST-04: Destructible props must complete their destruction animation within 5
 
 ## Open Questions
 
-- How many stages are in scope for the initial release?
-- Are stage transitions animated (e.g. a wipe or fade), or instant?
-- Should item pickups remain on screen indefinitely or despawn after a time limit?
 - Are there any vertical elements to the stage (e.g. stairs, elevation changes that affect combat)?
-- Should the stage data format be JSON, TypeScript constants, or a Tiled map file?
-- Are there mid-stage boss encounters that lock the camera at a specific point before a sub-boss appears?
