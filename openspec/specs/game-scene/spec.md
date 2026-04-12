@@ -1,0 +1,53 @@
+# game-scene Specification
+
+## Purpose
+TBD - created by archiving change game-loop. Update Purpose after archive.
+## Requirements
+### Requirement: GameScene runs a fixed-timestep update loop
+The system SHALL implement a fixed-timestep accumulator in `GameScene.update(time, delta)`. On each render frame, `delta` is accumulated; for each full `FIXED_DELTA_MS` interval accumulated, one fixed-update step runs. Steps per frame are capped at `MAX_STEPS_PER_FRAME`; surplus time is discarded.
+
+#### Scenario: Multiple steps run when frame delta is large
+- **WHEN** `GameScene.update()` is called with a `delta` of `2 × FIXED_DELTA_MS`
+- **THEN** exactly 2 fixed-update steps execute that frame
+
+#### Scenario: Steps are capped at MAX_STEPS_PER_FRAME
+- **WHEN** `delta` exceeds `MAX_STEPS_PER_FRAME × FIXED_DELTA_MS`
+- **THEN** exactly `MAX_STEPS_PER_FRAME` steps run and surplus time is discarded (not carried over)
+
+#### Scenario: Single normal step on a 60 fps frame
+- **WHEN** `delta` equals `FIXED_DELTA_MS`
+- **THEN** exactly 1 fixed-update step runs
+
+### Requirement: GameScene provides lifecycle hooks for subsystems
+The system SHALL expose `registerFixedUpdate(fn: (dt: number) => void)` and `unregisterFixedUpdate(fn)` methods on `GameScene` so that player, stage, combat, AI, and HUD subsystems can subscribe to the fixed-timestep tick without modifying `GameScene` directly.
+
+#### Scenario: Registered callback is called each fixed step
+- **WHEN** a callback is registered via `registerFixedUpdate` and a fixed step runs
+- **THEN** the callback is invoked with `FIXED_DELTA_MS` as the argument
+
+#### Scenario: Unregistered callback is not called
+- **WHEN** a callback is unregistered via `unregisterFixedUpdate` and a fixed step runs
+- **THEN** the callback is NOT invoked
+
+### Requirement: GameScene supports pause and resume
+The system SHALL implement pause by calling `this.scene.pause()` (which stops the Phaser update clock) and launching a `PauseOverlayScene`. Resume calls `this.scene.resume()` and stops `PauseOverlayScene`. Audio is paused/resumed alongside the scene.
+
+#### Scenario: Pause suspends fixed-update callbacks
+- **WHEN** the pause input is received and `GameScene` is paused
+- **THEN** registered fixed-update callbacks are no longer called until the scene resumes
+
+#### Scenario: Pause is not available during transitions
+- **WHEN** the game is in a scene transition (boot, preload, game-over, stage-clear)
+- **THEN** the pause input is ignored
+
+#### Scenario: Resume restores exact game state
+- **WHEN** the game resumes from pause
+- **THEN** game objects are in the same state as at the moment of pause (no extra update steps)
+
+### Requirement: Canvas scaling supports fixed-size and responsive modes
+The system SHALL configure Phaser Scale Manager to support both a fixed-size canvas (`NO_CENTER` mode) and a responsive mode that scales to fit the browser window while maintaining the original aspect ratio (`FIT` mode with `CENTER_BOTH`). The active mode is controlled by `GameConfig.SCALE_MODE`.
+
+#### Scenario: Canvas fills window in responsive mode
+- **WHEN** `GameConfig.SCALE_MODE` is `'FIT'` and the browser window is resized
+- **THEN** the canvas scales to fit within the window while preserving the aspect ratio defined by `CANVAS_WIDTH / CANVAS_HEIGHT`
+

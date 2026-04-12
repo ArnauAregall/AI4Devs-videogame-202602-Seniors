@@ -1,31 +1,29 @@
+import { Game } from 'phaser';
+import { PhaserGameConfig } from '../config/GameConfig';
 import { Boot } from './scenes/Boot';
-import { GameOver } from './scenes/GameOver';
-import { Game as MainGame } from './scenes/Game';
-import { MainMenu } from './scenes/MainMenu';
-import { AUTO, Game } from 'phaser';
 import { Preloader } from './scenes/Preloader';
-
-//  Find out more information about the Game Config at:
-//  https://docs.phaser.io/api-documentation/typedef/types-core#gameconfig
-const config: Phaser.Types.Core.GameConfig = {
-    type: AUTO,
-    width: 1024,
-    height: 768,
-    parent: 'game-container',
-    backgroundColor: '#028af8',
-    scene: [
-        Boot,
-        Preloader,
-        MainMenu,
-        MainGame,
-        GameOver
-    ]
-};
+import { MainMenu } from './scenes/MainMenu';
+import { GameScene } from './scenes/GameScene';
+import { PauseOverlay } from './scenes/PauseOverlay';
+import { GameOver } from './scenes/GameOver';
+import { StageClear } from './scenes/StageClear';
+import { TimeUp } from './scenes/TimeUp';
 
 const StartGame = (parent: string) => {
-
-    return new Game({ ...config, parent });
-
-}
+    return new Game({
+        ...PhaserGameConfig,
+        parent,
+        scene: [
+            Boot,
+            Preloader,
+            MainMenu,
+            GameScene,
+            PauseOverlay,
+            GameOver,
+            StageClear,
+            TimeUp,
+        ],
+    });
+};
 
 export default StartGame;
