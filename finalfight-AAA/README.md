@@ -78,3 +78,13 @@ The output is written to `dist/`. Upload the entire contents of that folder to a
 ## Assets
 
 Static assets (sprites, audio, etc.) live in `public/assets/` and are served directly by the dev server and copied verbatim into `dist/assets/` on build. Asset key constants are centralised in `src/assets/AssetKeys.ts`.
+
+## Credits
+
+All sprite assets used in this project are sourced from the following creators:
+
+| Asset Pack | Author | Source | Used for |
+|---|---|---|---|
+| Ultimate Warped Collection | ansimuz | https://ansimuz.itch.io/ultimate-warped-collection | Player, enemies (Brawler, Rusher, Knife Thrower), stage backgrounds and props |
+| Brute Arms | oonquil | https://oonquil.itch.io/brute-arms | Boss character sprites |
+| Tiny Food Pack | Chedda Games | https://cheddagames.itch.io/tiny-food-pack | Health item pickups (sushi) |
