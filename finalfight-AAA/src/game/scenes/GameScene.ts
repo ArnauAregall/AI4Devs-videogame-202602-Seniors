@@ -173,8 +173,11 @@ export class GameScene extends Scene {
             steps++;
         }
 
-        // Discard surplus to prevent spiral-of-death on severe frame drops
-        if (this._accumulator > 0) {
+        // Discard surplus ONLY when the step cap is hit (prevents spiral-of-death).
+        // Do NOT discard on normal frames — the remainder must carry over so the
+        // fixed tick fires at the correct average rate on high-refresh displays
+        // (e.g. 120 Hz where each frame delta < FIXED_DELTA_MS).
+        if (steps >= GameConfig.MAX_STEPS_PER_FRAME) {
             this._accumulator = 0;
         }
 
