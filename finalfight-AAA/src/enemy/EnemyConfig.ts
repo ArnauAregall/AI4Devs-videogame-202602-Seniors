@@ -187,22 +187,51 @@ export const BOSS_PUNCH_Y_OFFSET          = 16;
 export const BOSS_KICK_ALTERNATE_FRAMES   = 2;
 
 /** Phaser animation keys for the Boss (Brute Arms) sprite sheets. */
-export const BOSS_ANIM_IDLE   = 'boss-anim-idle';
-export const BOSS_ANIM_WALK   = 'boss-anim-walk';
-export const BOSS_ANIM_ATTACK = 'boss-anim-attack';
-export const BOSS_ANIM_HURT   = 'boss-anim-hurt';
-export const BOSS_ANIM_DEATH  = 'boss-anim-death';
+export const BOSS_ANIM_IDLE               = 'boss-anim-idle';
+export const BOSS_ANIM_WALK               = 'boss-anim-walk';
+export const BOSS_ANIM_ATTACK             = 'boss-anim-attack';
+export const BOSS_ANIM_HURT               = 'boss-anim-hurt';
+export const BOSS_ANIM_DEATH              = 'boss-anim-death';
+/** @spec boss-critical-attack */
+export const BOSS_ANIM_CRITICAL_TELEGRAPH = 'boss-anim-critical-telegraph';
+export const BOSS_ANIM_CRITICAL_ATTACK    = 'boss-anim-critical-attack';
 
 /** Frame counts per boss animation clip. */
-export const BOSS_ANIM_IDLE_FRAMES   = 8;  // BruteArm_Idle.png   800÷100
-export const BOSS_ANIM_WALK_FRAMES   = 6;  // BruteArm_Walk.png   600÷100
-export const BOSS_ANIM_ATTACK_FRAMES = 7;  // BruteArm_attack01.png 1120÷160
-export const BOSS_ANIM_HURT_FRAMES   = 8;  // BruteArm_Hurt.png  1280÷160
-export const BOSS_ANIM_DEATH_FRAMES  = 8;  // reuses hurt sheet
+export const BOSS_ANIM_IDLE_FRAMES                  = 8;  // BruteArm_Idle.png      800÷100
+export const BOSS_ANIM_WALK_FRAMES                  = 6;  // BruteArm_Walk.png      600÷100
+export const BOSS_ANIM_ATTACK_FRAMES                = 7;  // boss-attack-1.png     1120÷160
+export const BOSS_ANIM_HURT_FRAMES                  = 8;  // BruteArm_Hurt.png     1280÷160
+export const BOSS_ANIM_DEATH_FRAMES                 = 8;  // reuses hurt sheet
+export const BOSS_ANIM_CRITICAL_TELEGRAPH_FRAMES    = 5;  // boss-attack-3.png      800÷160
+export const BOSS_ANIM_CRITICAL_ATTACK_FRAMES       = 8;  // boss-attack-4.png     1280÷160
 
 /** Frame rates (fps) per boss animation clip. */
-export const BOSS_ANIM_IDLE_FPS   = 8;
-export const BOSS_ANIM_WALK_FPS   = 10;
-export const BOSS_ANIM_ATTACK_FPS = 12;
-export const BOSS_ANIM_HURT_FPS   = 12;
-export const BOSS_ANIM_DEATH_FPS  = 8;
+export const BOSS_ANIM_IDLE_FPS                  = 8;
+export const BOSS_ANIM_WALK_FPS                  = 10;
+export const BOSS_ANIM_ATTACK_FPS                = 12;
+export const BOSS_ANIM_HURT_FPS                  = 12;
+export const BOSS_ANIM_DEATH_FPS                 = 8;
+export const BOSS_ANIM_CRITICAL_TELEGRAPH_FPS    = 15;  // 5 frames @ 15fps ≈ 333ms
+export const BOSS_ANIM_CRITICAL_ATTACK_FPS       = 10;  // 8 frames @ 10fps = 800ms
+
+// ─── Critical attack constants ──────────────────────────────────────────────
+/** @spec boss-standard-attack */
+export const BOSS_STANDARD_DAMAGE    = BOSS_PUNCH_DAMAGE;   // alias — standard uses existing punch
+export const BOSS_STANDARD_KNOCKBACK = BOSS_PUNCH_KNOCKBACK_X;
+
+/** @spec boss-critical-attack */
+export const BOSS_CRITICAL_DAMAGE           = 50;    // ~3× standard; one-shots careless players
+export const BOSS_CRITICAL_KNOCKBACK        = 120;   // much further than standard
+export const BOSS_CRITICAL_KNOCKBACK_Y      = -6;
+export const BOSS_CRITICAL_PROBABILITY      = 0.15;  // 15% base chance per attack
+export const BOSS_CRITICAL_COOLDOWN_TICKS   = 300;   // 5 s at 60 fps
+export const BOSS_CRITICAL_TELEGRAPH_FRAMES_DURATION = 20;  // ticks (≈333 ms)
+
+/** Phase probability boosts. @spec boss-controller MODIFIED */
+export const BOSS_PHASE2_CRITICAL_BOOST = 0.10;  // 15% → 25% in phase 2
+export const BOSS_PHASE3_CRITICAL_BOOST = 0.10;  // 25% → 35% in phase 3
+
+/** Hitbox dimensions for the critical swing (wider reach). */
+export const BOSS_CRITICAL_HITBOX_W     = 60;
+export const BOSS_CRITICAL_HITBOX_H     = 38;
+export const BOSS_CRITICAL_HIT_STUN     = 28;

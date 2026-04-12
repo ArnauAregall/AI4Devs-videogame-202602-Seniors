@@ -3,13 +3,14 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 const mocks = vi.hoisted(() => {
   const spriteMock = {
     x: 100, y: 150,
-    setFlipX:    vi.fn(),
-    setDepth: vi.fn(),
-    setVelocityX: vi.fn(),
-    setVelocityY: vi.fn(),
+    setFlipX:              vi.fn(),
+    setDepth:              vi.fn(),
+    setVelocityX:          vi.fn(),
+    setVelocityY:          vi.fn(),
     setCollideWorldBounds: vi.fn(),
-    destroy:      vi.fn(),
-    play:         vi.fn(),
+    destroy:               vi.fn(),
+    play:                  vi.fn(),
+    once:                  vi.fn(),
   };
   const sceneMock = {
     physics: { add: { sprite: vi.fn(() => spriteMock) } },
@@ -21,8 +22,13 @@ const mocks = vi.hoisted(() => {
 });
 
 vi.mock('phaser', () => ({
-  default: { Scene: class {}, Scale: { FIT: 'FIT', NONE: 'NONE', CENTER_BOTH: 'CENTER_BOTH' } },
-  Scene:   class {},
+  default: {
+    Scene: class {},
+    Scale: { FIT: 'FIT', NONE: 'NONE', CENTER_BOTH: 'CENTER_BOTH' },
+    Animations: { Events: { ANIMATION_COMPLETE: 'animationcomplete' } },
+  },
+  Scene:      class {},
+  Animations: { Events: { ANIMATION_COMPLETE: 'animationcomplete' } },
 }));
 
 import type Phaser from 'phaser';
