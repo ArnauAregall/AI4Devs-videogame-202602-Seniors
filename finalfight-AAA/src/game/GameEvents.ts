@@ -13,6 +13,7 @@ export const GameEvents = {
   COMBO_UPDATED:           'comboUpdated',
   SPECIAL_COOLDOWN_CHANGED:'specialCooldownChanged',
   TIMER_TICK:              'timerTick',
+  TIMER_EXPIRED:           'timerExpired',
   STAGE_CLEARED:           'stageCleared',
   GAME_OVER:               'gameOver',
   PAUSE_TOGGLED:           'pauseToggled',
@@ -27,6 +28,7 @@ export type GameEventPayloads = {
   [GameEvents.COMBO_UPDATED]:           { count: number; windowActive: boolean };
   [GameEvents.SPECIAL_COOLDOWN_CHANGED]:{ fraction: number };
   [GameEvents.TIMER_TICK]:              { remaining: number };
+  [GameEvents.TIMER_EXPIRED]:           Record<string, never>;
   [GameEvents.STAGE_CLEARED]:           { score: number; timeBonus: number };
   [GameEvents.GAME_OVER]:               { score: number };
   [GameEvents.PAUSE_TOGGLED]:           { paused: boolean };

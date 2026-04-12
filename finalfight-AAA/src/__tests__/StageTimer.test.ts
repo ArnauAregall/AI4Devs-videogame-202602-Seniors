@@ -21,6 +21,7 @@ vi.mock('phaser', () => ({
 }));
 
 import { GameConfig } from '../config/GameConfig';
+import { GameEvents } from '../game/GameEvents';
 import { StageTimer } from '../stage/StageTimer';
 
 describe('StageTimer', () => {
@@ -58,21 +59,21 @@ describe('StageTimer', () => {
     expect(timer.secondsRemaining).toBe(179);
   });
 
-  it('emits timeUp event when ticks reach zero', () => {
+  it('emits TIMER_EXPIRED event when ticks reach zero', () => {
     for (let i = 0; i < TOTAL_TICKS; i++) {
       registeredCallback(GameConfig.FIXED_DELTA_MS);
     }
-    expect(mocks.sceneMock.events.emit).toHaveBeenCalledWith('timeUp');
+    expect(mocks.sceneMock.events.emit).toHaveBeenCalledWith(GameEvents.TIMER_EXPIRED);
   });
 
-  it('does not emit timeUp more than once', () => {
+  it('does not emit TIMER_EXPIRED more than once', () => {
     for (let i = 0; i < TOTAL_TICKS + 5; i++) {
       registeredCallback(GameConfig.FIXED_DELTA_MS);
     }
-    const timeUpCalls = mocks.sceneMock.events.emit.mock.calls.filter(
-      (args: unknown[]) => args[0] === 'timeUp',
+    const expiredCalls = mocks.sceneMock.events.emit.mock.calls.filter(
+      (args: unknown[]) => args[0] === GameEvents.TIMER_EXPIRED,
     );
-    expect(timeUpCalls).toHaveLength(1);
+    expect(expiredCalls).toHaveLength(1);
   });
 
   it('ticksRemaining does not go below 0', () => {
@@ -82,12 +83,12 @@ describe('StageTimer', () => {
     expect(timer.ticksRemaining).toBe(0);
   });
 
-  it('stop() prevents timeUp from firing', () => {
+  it('stop() prevents TIMER_EXPIRED from firing', () => {
     timer.stop();
     for (let i = 0; i < TOTAL_TICKS; i++) {
       registeredCallback(GameConfig.FIXED_DELTA_MS);
     }
-    expect(mocks.sceneMock.events.emit).not.toHaveBeenCalledWith('timeUp');
+    expect(mocks.sceneMock.events.emit).not.toHaveBeenCalledWith(GameEvents.TIMER_EXPIRED);
   });
 
   it('registers fixedUpdate callback on construction', () => {

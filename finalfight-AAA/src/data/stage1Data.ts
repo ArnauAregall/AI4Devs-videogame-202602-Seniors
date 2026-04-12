@@ -31,9 +31,9 @@ export const stage1Data: StageData = {
     { textureKey: ASSET_KEY_CYBERPUNK_LAYER_6, speedFactor: 0.80, depth: 5 },
   ],
   scrollTriggers: [
-    { worldX: 1500, zoneId: 'zone-1a' },
-    { worldX: 3200, zoneId: 'zone-1b' },
-    { worldX: 5000, zoneId: 'zone-1c' },
+    { worldX: 700,  zoneId: 'zone-1a' },
+    { worldX: 2000, zoneId: 'zone-1b' },
+    { worldX: 3500, zoneId: 'zone-1c' },
   ],
   spawnZones: [
     {
@@ -45,13 +45,16 @@ export const stage1Data: StageData = {
     {
       id: 'zone-1b',
       entries: [
-        { archetype: 'brawler', count: 3, staggerDelayMs: 400 },
+        { archetype: 'brawler', count: 2, staggerDelayMs: 400 },
+        { archetype: 'rusher',  count: 1, staggerDelayMs: 600 },
       ],
     },
     {
       id: 'zone-1c',
       entries: [
-        { archetype: 'brawler', count: 4, staggerDelayMs: 300 },
+        { archetype: 'brawler',       count: 2, staggerDelayMs: 300 },
+        { archetype: 'rusher',        count: 1, staggerDelayMs: 500 },
+        { archetype: 'knife-thrower', count: 1, staggerDelayMs: 800 },
       ],
     },
   ],

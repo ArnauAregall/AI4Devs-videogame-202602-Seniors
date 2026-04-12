@@ -3,16 +3,22 @@ import { GameConfig } from '../../config/GameConfig';
 import type { GameScene as GameSceneType } from './GameScene';
 
 export class GameOver extends Scene {
+    private _cursor   = 0;
+    private _options: Phaser.GameObjects.Text[] = [];
+
     constructor() {
         super('GameOverScene');
     }
 
     create(data?: { score?: number; continuesLeft?: number }): void {
-        const score = data?.score ?? 0;
+        const score         = data?.score         ?? 0;
         const continuesLeft = data?.continuesLeft ?? 0;
 
         const { width, height } = this.scale;
         const cx = width / 2;
+
+        this._cursor  = 0;
+        this._options = [];
 
         this.cameras.main.setBackgroundColor(0x110000);
 
@@ -41,38 +47,56 @@ export class GameOver extends Scene {
                 stroke: '#000000',
                 strokeThickness: 2,
             }).setOrigin(0.5).setInteractive({ useHandCursor: true });
-
-            continueText.on('pointerover', () => continueText.setColor('#ffcc00'));
-            continueText.on('pointerout',  () => continueText.setColor('#ffffff'));
             continueText.on('pointerdown', () => this.handleContinue());
-            this.input.keyboard?.on('keydown-ENTER', () => this.handleContinue());
+            this._options.push(continueText);
             nextY += 0.14;
         }
 
         const highScoreText = this.add.text(cx, height * nextY, 'HIGH SCORES', {
             fontFamily: 'Arial Black',
             fontSize: `${Math.floor(GameConfig.CANVAS_WIDTH / 26)}px`,
-            color: '#aaaaaa',
+            color: '#ffffff',
             stroke: '#000000',
             strokeThickness: 2,
         }).setOrigin(0.5).setInteractive({ useHandCursor: true });
-
-        highScoreText.on('pointerover', () => highScoreText.setColor('#ffcc00'));
-        highScoreText.on('pointerout',  () => highScoreText.setColor('#aaaaaa'));
         highScoreText.on('pointerdown', () => this.showLeaderboard());
+        this._options.push(highScoreText);
         nextY += 0.12;
 
         const quitText = this.add.text(cx, height * nextY, 'QUIT TO MAIN MENU', {
             fontFamily: 'Arial Black',
             fontSize: `${Math.floor(GameConfig.CANVAS_WIDTH / 26)}px`,
-            color: '#aaaaaa',
+            color: '#ffffff',
             stroke: '#000000',
             strokeThickness: 2,
         }).setOrigin(0.5).setInteractive({ useHandCursor: true });
-
-        quitText.on('pointerover', () => quitText.setColor('#ffffff'));
-        quitText.on('pointerout',  () => quitText.setColor('#aaaaaa'));
         quitText.on('pointerdown', () => this.quitToMenu());
+        this._options.push(quitText);
+
+        // Keyboard navigation
+        this.input.keyboard?.on('keydown-UP',    () => { this._cursor = (this._cursor - 1 + this._options.length) % this._options.length; this._refresh(); });
+        this.input.keyboard?.on('keydown-DOWN',  () => { this._cursor = (this._cursor + 1) % this._options.length; this._refresh(); });
+        this.input.keyboard?.on('keydown-ENTER', () => this._activate());
+
+        this._refresh();
+    }
+
+    private _refresh(): void {
+        this._options.forEach((t, i) => t.setColor(i === this._cursor ? '#ffcc00' : '#ffffff'));
+    }
+
+    private _activate(): void {
+        const handlers = [
+            () => this.handleContinue(),
+            () => this.showLeaderboard(),
+            () => this.quitToMenu(),
+        ];
+        // Map cursor to the correct handler accounting for the optional Continue entry
+        // _options is built in order: [Continue?], HighScores, Quit
+        const handler = handlers[
+            this._options.length === 3 ? this._cursor : this._cursor + 1
+        ];
+        handler?.();
     }
 
     private handleContinue(): void {

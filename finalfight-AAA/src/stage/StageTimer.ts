@@ -51,7 +51,7 @@ export class StageTimer {
     if (this._ticksRemaining <= 0) {
       this._ticksRemaining = 0;
       this._fired = true;
-      this.scene.events.emit('timeUp');
+      this.scene.events.emit(GameEvents.TIMER_EXPIRED);
     }
   }
 

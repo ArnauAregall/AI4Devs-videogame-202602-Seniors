@@ -62,6 +62,7 @@ export class GameScene extends Scene {
     create(): void {
         // Hitbox group for player attacks (combat-system queries this group)
         this.playerHitboxGroup = this.physics.add.staticGroup();
+        /* no player-enemy collider — intentional: FR-GOLV-01 */
 
         // Item pickup group (for Arcade overlap queries)
         this.itemPickupGroup = this.add.group();
@@ -97,6 +98,11 @@ export class GameScene extends Scene {
 
         // Stage subsystem — initialise after player so StageManager can call getPlayer()
         this._stageManager = new StageManager(this, stage1Data, 1);
+
+        // Timer expiry → game over (only when stage not yet cleared)
+        this.events.on(GameEvents.TIMER_EXPIRED, () => {
+            if (!this._stageManager?.isCleared) this.triggerGameOver();
+        });
 
         // ── HUD event wiring ────────────────────────────────────────────────
 
