@@ -98,22 +98,26 @@ NFR-AS-04: The `AssetKeys.ts` file must be the single source of truth for asset 
 
 ## Open Questions
 
-- Player Grab state (FR-PL-07): No grab or throw animation exists for the Brawler Girl in the current asset pack. Either a placeholder must be used, or the grab must be represented using existing frames (e.g. reusing punch frames) until a grab sprite is available.
+- Player Grab state (FR-PL-07): No grab or throw animation exists for the Brawler Girl in either asset pack. Neither streets-of-fight nor cyberpunk-platformer-worldstarter covers this state. A placeholder using existing punch frames is required until a matching sprite is sourced manually.
 
-- Player Knockdown state (FR-PL-09) and Get-Up state (FR-PL-10): No knockdown or get-up animation exists for the Brawler Girl. A placeholder or a flipped hurt frame may need to be used temporarily.
+- Player Knockdown state (FR-PL-09) and Get-Up state (FR-PL-10): No knockdown or get-up animation exists for the Brawler Girl in either asset pack. A placeholder using a flipped hurt frame is required until a matching sprite is sourced manually.
 
-- Player Special Attack state (FR-PL-11): No special attack animation exists for the Brawler Girl. A placeholder or composite of existing frames is required.
+- Player Special Attack state (FR-PL-11): No special attack animation exists for the Brawler Girl in either asset pack. A composite of existing frames or a new bespoke sprite is required.
 
-- Enemy Punch Archetype B — Rusher (FR-EA-03): No sprite exists for this archetype. It must be created, sourced from another free pack, or stubbed until a matching asset is available.
+- Enemy Punch Archetype B — Rusher (FR-EA-03): No sprite exists for this archetype in either asset pack. Must be created, sourced from another free pack, or stubbed.
 
-- Enemy Archetype C — Knife Thrower (FR-EA-04): No sprite exists for this archetype or for the thrown projectile. Same resolution path as Archetype B.
+- Enemy Archetype C — Knife Thrower (FR-EA-04): No sprite exists for this archetype or for the thrown projectile in either asset pack. Must be created, sourced, or stubbed.
 
-- Enemy Knockdown and Death animations (FR-EA-12, FR-EA-13): Neither the Enemy Punk nor any other enemy archetype has knockdown or death animation frames in the current pack. Placeholders are required.
+- Enemy Knockdown and Death animations (FR-EA-12, FR-EA-13): Neither the Enemy Punk nor any other enemy archetype has knockdown or death animation frames in either asset pack. Placeholders are required.
 
-- Boss enemy (FR-EA-20, FR-EA-21): No boss character sprite exists in the current asset pack.
+- Boss enemy (FR-EA-20, FR-EA-21): No boss character sprite exists in either asset pack. Must be created or sourced before Phase 3 boss implementation begins.
 
-- HUD UI elements (FR-HU-01, FR-HU-04, FR-HU-08): No dedicated sprite assets exist for health bars, lives icons, timers, or score displays. These elements are expected to be drawn programmatically using Phaser Graphics and BitmapText, but a player icon for the lives display (FR-HU-04) is not yet available.
+- HUD UI elements (FR-HU-01, FR-HU-04, FR-HU-08): No dedicated sprite assets exist in either asset pack for health bars, lives icons, timers, or score displays. These elements must be drawn programmatically using Phaser Graphics and BitmapText. The player lives icon (FR-HU-04) remains unavailable as a sprite asset.
 
-- Third parallax layer: The current pack provides `back.png`, `fore.png`, and `tileset.png`. FR-ST-04 requires a minimum of three parallax layers; confirm that `tileset.png` serves as the middle layer or identify an additional background image.
+- Third parallax layer — RESOLVED (partial): FR-ST-04 requires a minimum of three parallax layers. The streets-of-fight pack provides `back.png`, `fore.png`, and `tileset.png`. The cyberpunk-platformer-worldstarter pack adds six dedicated tiling parallax layers (`cyberpunk-layer-1.png` through `cyberpunk-layer-6.png`, each 512×288) provisioned to `stage/layers/`. The minimum-three requirement is satisfied. The cyberpunk layers are available as supplementary layers or as an alternative stage visual theme.
 
-- Item pickup sprites (FR-ST-15, FR-EA-14): No health pickup or score item sprites are present. The sushi and ethereum sprites could serve as score items, but a health pickup sprite is absent.
+- Item pickup sprites (FR-ST-15, FR-EA-14) — PARTIAL: No dedicated health pickup or score item sprites are present in either pack. `items/cyberpunk-decorations.png` (provisioned from cyberpunk-platformer-worldstarter, 336×160, ASSET_KEY_CYBERPUNK_DECORATIONS) is a decorations tileset that may contain usable item frames once individual frame dimensions are confirmed. The sushi and ethereum props from streets-of-fight could also serve as score items. A health pickup sprite is still absent and requires manual sourcing or programmatic rendering.
+
+## Non-Functional Requirements Addendum
+
+NFR-AS-05: Assets sourced from cyberpunk-platformer-worldstarter that are flagged as partial (specifically `cyberpunk-decorations.png`) must have their frame dimensions confirmed via visual inspection before being wired to Phaser `load.spritesheet()`. Until confirmed, they must be loaded with `load.image()` only.
