@@ -292,6 +292,18 @@ export class PlayerController {
     this.hp = Math.min(GameConfig.PLAYER_MAX_HP, this.hp + amount);
   }
 
+  /**
+   * Fully restore HP and lives after a Continue, granting respawn i-frames
+   * and transitioning back to the GetUp animation so the player can act.
+   * Called by GameScene.resumeAfterContinue().
+   */
+  respawn(): void {
+    this.hp                = this.maxHp;
+    this.lives             = GameConfig.PLAYER_LIVES;
+    this.iFramesRemaining  = GameConfig.RESPAWN_IFRAMES;
+    this._stateMachine.transition(PlayerState.GetUp);
+  }
+
   // ── Destroy ──────────────────────────────────────────────────────────────
 
   /**

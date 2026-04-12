@@ -246,6 +246,7 @@ export class GameScene extends Scene {
     resumeAfterContinue(): void {
         this._continuesUsed++;
         this._accumulator = 0;
+        this._player?.respawn();
         this.scene.resume();
         this.sound.resumeAll();
     }
