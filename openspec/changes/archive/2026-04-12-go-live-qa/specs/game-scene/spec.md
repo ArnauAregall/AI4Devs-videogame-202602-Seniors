@@ -35,6 +35,22 @@ Events and their payloads:
 - **WHEN** the player presses the pause input
 - **THEN** `PAUSE_TOGGLED` is emitted with the correct `paused` boolean
 
+#### Scenario: PLAYER_HEALTH_CHANGED emitted on player damage
+- **WHEN** the player takes damage
+- **THEN** `PLAYER_HEALTH_CHANGED` is emitted with updated `current` and `max`
+
+#### Scenario: SCORE_CHANGED emitted on enemy defeat
+- **WHEN** an enemy is defeated
+- **THEN** `SCORE_CHANGED` is emitted with the enemy's point value as `delta`
+
+#### Scenario: BOSS_ARRIVED emitted when boss spawns
+- **WHEN** a boss enemy enters the scene
+- **THEN** `BOSS_ARRIVED` is emitted with the boss's `maxHealth`
+
+#### Scenario: PAUSE_TOGGLED emitted on pause input
+- **WHEN** the player presses the pause input
+- **THEN** `PAUSE_TOGGLED` is emitted with the correct `paused` boolean
+
 ## ADDED Requirements
 
 ### Requirement: GameScene handles TIMER_EXPIRED to trigger game over

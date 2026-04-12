@@ -27,6 +27,8 @@ The scene SHALL always show a "Quit to Main Menu" option.
 - **WHEN** the Game Over screen is visible
 - **THEN** a "Quit to Main Menu" option is visible regardless of continue count
 
+## ADDED Requirements
+
 ### Requirement: Game Over screen supports keyboard cursor navigation
 The scene SHALL support keyboard navigation using the Up and Down arrow keys to
 move a cursor between the visible menu options, and Enter to activate the

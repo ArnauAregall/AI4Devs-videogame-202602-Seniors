@@ -1,6 +1,6 @@
 ## MODIFIED Requirements
 
-### Requirement: FR-TIM-02 Time Up event at zero uses GameEvents constant
+### Requirement: FR-TIM-02 Time Up event at zero
 When `ticksRemaining` reaches 0 the StageTimer SHALL emit
 `GameEvents.TIMER_EXPIRED` (`'timerExpired'`) on the scene event bus exactly
 once. The literal string `'timeUp'` SHALL no longer be used; all callsites
