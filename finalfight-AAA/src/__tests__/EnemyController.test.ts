@@ -8,6 +8,7 @@ const mocks = vi.hoisted(() => {
     setDepth: vi.fn(),
     setVelocityX: vi.fn(),
     setVelocityY: vi.fn(),
+    setCollideWorldBounds: vi.fn(),
     destroy: vi.fn(),
   };
   const physicsMock = {
@@ -186,5 +187,27 @@ describe('BrawlerController (via EnemyController base)', () => {
     });
     // HP should not decrease further
     expect(brawler.hp).toBe(hpAfterDeath);
+  });
+
+  it('Y velocity is always set to 0 on hit (no vertical launch)', () => {
+    const { brawler, combat } = makeBrawler({ x: 0 });
+    brawler.fixedUpdate(BRAWLER_AGGRO_RADIUS - 5, 150);
+    mocks.spriteMock.setVelocityY.mockClear();
+    combat.dispatchHit('enemy_test-brawler', {
+      damage: 5,
+      knockbackX: 30,
+      knockbackY: -4, // non-zero Y knockback must still be zeroed
+      hitStunFrames: 10,
+      attackerFacing: 'right',
+      teamTag: 'player',
+      isGrab: false,
+      isAoe: false,
+    });
+    expect(mocks.spriteMock.setVelocityY).toHaveBeenCalledWith(0);
+  });
+
+  it('setCollideWorldBounds(true) called on sprite at construction', () => {
+    makeBrawler(); // create a fresh brawler
+    expect(mocks.spriteMock.setCollideWorldBounds).toHaveBeenCalledWith(true);
   });
 });

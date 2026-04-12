@@ -7,6 +7,7 @@ const mocks = vi.hoisted(() => {
     setDepth: vi.fn(),
     setVelocityX: vi.fn(),
     setVelocityY: vi.fn(),
+    setCollideWorldBounds: vi.fn(),
     destroy:      vi.fn(),
   };
   const sceneMock = {

@@ -171,6 +171,37 @@ describe('StageManager', () => {
     expect(manager.isLocked).toBe(false);
   });
 
+  it('unlocks gate on zoneCleared even when earlier zones still remain', () => {
+    // Multi-zone stage: 3 zones. Lock the camera, fire zone cleared for the FIRST zone.
+    // FR-SM-02: gate must unlock after ANY zone is cleared, not only after all zones.
+    const multiZoneStage: StageData = {
+      ...SIMPLE_STAGE,
+      scrollTriggers: [
+        { worldX: 400, zoneId: 'z1' },
+        { worldX: 800, zoneId: 'z2' },
+        { worldX: 1200, zoneId: 'z3' },
+      ],
+      spawnZones: [
+        { id: 'z1', entries: [{ archetype: 'punk', count: 1, staggerDelayMs: 0 }] },
+        { id: 'z2', entries: [{ archetype: 'punk', count: 1, staggerDelayMs: 0 }] },
+        { id: 'z3', entries: [{ archetype: 'punk', count: 1, staggerDelayMs: 0 }] },
+      ],
+    };
+    vi.clearAllMocks();
+    let localZoneClearedHandler: (id: string) => void = () => {};
+    mocks.sceneMock.events.on.mockImplementation((event: string, fn: (id: string) => void) => {
+      if (event === 'zoneCleared') localZoneClearedHandler = fn;
+    });
+    const multiManager = new StageManager(
+      mocks.sceneMock as unknown as Parameters<typeof StageManager>[0],
+      multiZoneStage,
+      1,
+    );
+    multiManager['_locked'] = true;
+    localZoneClearedHandler('z1'); // only first zone cleared — 2 zones still pending
+    expect(multiManager.isLocked).toBe(false);
+  });
+
   it('updates cameras.main.scrollX each tick', () => {
     mocks.playerSpriteMock.x = 350;
     tick();

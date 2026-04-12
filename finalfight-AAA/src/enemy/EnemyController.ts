@@ -92,6 +92,8 @@ export abstract class EnemyController {
     this._sprite = cfg.scene.physics.add.sprite(cfg.x, cfg.y, cfg.textureKey);
     this._sprite.setDepth(GameConfig.ENTITY_DEPTH);
     this._sprite.setFlipX(!cfg.facingRight);
+    // Prevent enemies from leaving canvas bounds vertically. @spec enemy-controller
+    this._sprite.setCollideWorldBounds(true);
 
     this._hurtboxId   = `enemy_${cfg.id}`;
     this._onHitBound  = this._dispatchedHit.bind(this);
@@ -275,9 +277,9 @@ export abstract class EnemyController {
 
     const dir = event.attackerFacing === 'right' ? 1 : -1;
     this._sprite.setVelocityX(dir * Math.abs(event.knockbackX));
-    if (event.knockbackY !== 0) {
-      this._sprite.setVelocityY(event.knockbackY * 20);
-    }
+    // Knockback is horizontal-only in a 2D beat-'em-up. Zero Y velocity to prevent
+    // enemies flying off-screen vertically. @spec enemy-controller
+    this._sprite.setVelocityY(0);
 
     if (this._hp <= 0) {
       this._fsm.transition(EnemyState.Death);

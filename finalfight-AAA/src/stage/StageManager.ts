@@ -146,9 +146,10 @@ export class StageManager {
 
   private _onZoneCleared(_zoneId: string): void {
     this._zonesCleared++;
-    if (this._zonesCleared >= this._zonesTotal) {
-      this._locked = false;
-    }
+    // Unlock immediately on every zone clear, not just when all zones are done.
+    // Each scroll trigger re-locks the camera when the player reaches the next zone boundary.
+    // @spec FR-SM-02
+    this._locked = false;
   }
 
   private _startStageClear(): void {
