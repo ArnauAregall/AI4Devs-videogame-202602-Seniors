@@ -1,6 +1,8 @@
 import { Scene } from 'phaser';
 import { GameConfig } from '../../config/GameConfig';
 import { PlayerController } from '../../player/PlayerController';
+import { StageManager } from '../../stage/StageManager';
+import { stage1Data } from '../../data/stage1Data';
 
 type FixedUpdateFn = (dt: number) => void;
 
@@ -11,8 +13,14 @@ export class GameScene extends Scene {
     /** @spec game-scene – Requirement: getPlayer() accessor */
     private _player: PlayerController | null = null;
 
+    /** @spec game-scene – Requirement: getStageManager() accessor */
+    private _stageManager: StageManager | null = null;
+
     /** Physics group for all player attack hitboxes. Queried by combat-system. */
     playerHitboxGroup!: Phaser.Physics.Arcade.StaticGroup;
+
+    /** Group for item pickup sprites (for future Arcade overlap queries). */
+    itemPickupGroup!: Phaser.GameObjects.Group;
 
     constructor() {
         super('GameScene');
@@ -21,6 +29,9 @@ export class GameScene extends Scene {
     create(): void {
         // Hitbox group for player attacks (combat-system queries this group)
         this.playerHitboxGroup = this.physics.add.staticGroup();
+
+        // Item pickup group (for Arcade overlap queries)
+        this.itemPickupGroup = this.add.group();
 
         // Pause input
         this.input.keyboard?.on('keydown-ESC', () => this.pauseGame());
@@ -31,10 +42,12 @@ export class GameScene extends Scene {
         const spawnY = (GameConfig.GROUND_TOP + GameConfig.GROUND_BOTTOM) / 2;
         this._player = new PlayerController(this, spawnX, spawnY);
 
-        // TODO(stage): register stage fixed-update callback here
         // TODO(combat): register combat fixed-update callback here
         // TODO(enemy-ai): register enemy-ai fixed-update callback here
         // TODO(hud): register hud fixed-update callback here
+
+        // Stage subsystem — initialise after player so StageManager can call getPlayer()
+        this._stageManager = new StageManager(this, stage1Data, 1);
     }
 
     /** Register a callback to be called once per fixed timestep tick. */
@@ -87,6 +100,14 @@ export class GameScene extends Scene {
      */
     getPlayer(): PlayerController | null {
         return this._player;
+    }
+
+    /**
+     * Returns the active StageManager, or null if not yet created.
+     * @spec game-scene – Requirement: getStageManager() accessor
+     */
+    getStageManager(): StageManager | null {
+        return this._stageManager;
     }
 
     /**

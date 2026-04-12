@@ -39,6 +39,22 @@ export const GameConfig = {
   SPECIAL_COOLDOWN_TICKS: 600,
   /** Radius (px) of the area-of-effect for the special attack. @spec FR-PL-11 */
   SPECIAL_ATTACK_RADIUS: 120,
+
+  // ── Stage ────────────────────────────────────────────────────
+  /** Off-screen margin (px) used when placing enemy spawn X. @spec FR-SZ-02 */
+  SPAWN_OFFSCREEN_MARGIN: 64,
+  /** Fixed ticks before an uncollected item auto-despawns (15 s × 60 fps). @spec FR-IP-02 */
+  ITEM_DESPAWN_TICKS: 900,
+  /** HP restored when a health pickup is collected. @spec FR-IP-01 */
+  ITEM_HEALTH_RESTORE_AMOUNT: 30,
+  /** Hit-points of a barrel prop. @spec FR-DP-01 */
+  PROP_BARREL_HP: 3,
+  /** Hit-points of a crate prop. @spec FR-DP-01 */
+  PROP_CRATE_HP: 2,
+  /** Duration (ms) of the fade-to-black transition between stages. @spec FR-SM-04 */
+  STAGE_TRANSITION_FADE_MS: 500,
+  /** Half-width (px) of the player body used for boundary clamping. @spec FR-SM-05 */
+  PLAYER_BODY_HALF_WIDTH: 20,
 } as const;
 
 export const PhaserGameConfig: Phaser.Types.Core.GameConfig = {

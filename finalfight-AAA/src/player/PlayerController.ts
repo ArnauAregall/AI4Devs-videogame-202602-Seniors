@@ -198,6 +198,14 @@ export class PlayerController {
     }
   }
 
+  /**
+   * Restore HP by the given amount, clamped to PLAYER_MAX_HP.
+   * @spec FR-IP-03 Health pickup restores ITEM_HEALTH_RESTORE_AMOUNT HP
+   */
+  heal(amount: number): void {
+    this.hp = Math.min(GameConfig.PLAYER_MAX_HP, this.hp + amount);
+  }
+
   // ── Destroy ──────────────────────────────────────────────────────────────
 
   /**
