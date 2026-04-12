@@ -10,6 +10,9 @@ export class MainMenu extends Scene {
     }
 
     create(): void {
+        this._labels = [];
+        this._cursor = 0;
+
         const { width, height } = this.scale;
         const cx = width / 2;
 
@@ -41,8 +44,8 @@ export class MainMenu extends Scene {
             this._labels.push(txt);
         });
 
-        this._cursor = 0;
-        this._refresh();
+        // Defer first _refresh — same WebGL canvas init guard as PauseOverlay.
+        this.time.delayedCall(0, () => this._refresh());
 
         this.input.keyboard?.on('keydown-UP',    () => { this._move(-1); });
         this.input.keyboard?.on('keydown-W',     () => { this._move(-1); });
