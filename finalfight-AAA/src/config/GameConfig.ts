@@ -56,10 +56,10 @@ export const GameConfig = {
   PROP_BARREL_HP: 3,
   /** Hit-points of a crate prop. @spec FR-DP-01 */
   PROP_CRATE_HP: 2,
-  /** Tint applied to the barrel healthy sprite after the first hit. @spec barrel-damage-states */
-  BARREL_DAMAGED_TINT: 0xffaa88,
   /** Tint applied to the barrel crushed sprite. @spec barrel-damage-states, FR-DP-05 */
   BARREL_CRUSHED_TINT: 0x888888,
+  /** Default probability (0.0–1.0) that a barrel drops a health item on destruction. @spec health-item-drop */
+  BARREL_DROP_CHANCE_DEFAULT: 0.5,
   /** Minimum number of sushi items dropped when a barrel is destroyed. @spec health-item-drop */
   ITEM_DROP_COUNT_MIN: 1,
   /** Maximum number of sushi items dropped when a barrel is destroyed. @spec health-item-drop */

@@ -60,11 +60,11 @@ export const stage1Data: StageData = {
     },
   ],
   props: [
-    { worldX: 800,  worldY: groundMidY, type: 'barrel', hp: GameConfig.PROP_BARREL_HP, dropItemType: 'health' },
-    { worldX: 1200, worldY: groundMidY, type: 'crate',  hp: GameConfig.PROP_CRATE_HP,  dropItemType: null },
-    { worldX: 2400, worldY: groundMidY, type: 'barrel', hp: GameConfig.PROP_BARREL_HP, dropItemType: 'score' },
-    { worldX: 3800, worldY: groundMidY, type: 'crate',  hp: GameConfig.PROP_CRATE_HP,  dropItemType: 'health' },
-    { worldX: 4500, worldY: groundMidY, type: 'barrel', hp: GameConfig.PROP_BARREL_HP, dropItemType: null },
+    { worldX: 800,  worldY: groundMidY, type: 'barrel', hp: GameConfig.PROP_BARREL_HP, dropItemType: 'health', dropChance: GameConfig.BARREL_DROP_CHANCE_DEFAULT },
+    { worldX: 1200, worldY: groundMidY, type: 'crate',  hp: GameConfig.PROP_CRATE_HP,  dropItemType: null,     dropChance: 0 },
+    { worldX: 2400, worldY: groundMidY, type: 'barrel', hp: GameConfig.PROP_BARREL_HP, dropItemType: 'score',  dropChance: 1.0 },
+    { worldX: 3800, worldY: groundMidY, type: 'crate',  hp: GameConfig.PROP_CRATE_HP,  dropItemType: 'health', dropChance: GameConfig.BARREL_DROP_CHANCE_DEFAULT },
+    { worldX: 4500, worldY: groundMidY, type: 'barrel', hp: GameConfig.PROP_BARREL_HP, dropItemType: null,     dropChance: 0 },
   ],
 } as const;
 

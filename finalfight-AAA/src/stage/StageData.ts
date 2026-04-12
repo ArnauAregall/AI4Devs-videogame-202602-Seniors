@@ -57,6 +57,8 @@ export interface PropDef {
   hp: number;
   /** Item to spawn on destruction, or null for no drop. */
   dropItemType: ItemType;
+  /** Probability (0.0–1.0) that an item drops when the prop is destroyed. */
+  dropChance: number;
 }
 
 /** Complete data for one stage. */
