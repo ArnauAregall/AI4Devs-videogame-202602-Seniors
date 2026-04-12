@@ -18,8 +18,10 @@ import {
   RUSHER_ATTACK_COOLDOWN_TICKS, RUSHER_HURT_FRAMES, RUSHER_KNOCKDOWN_FRAMES,
   RUSHER_FLURRY_CYCLE_FRAMES, RUSHER_FLURRY_HIT_FRAME,
   RUSHER_PUNCH_OFFSET_PX, RUSHER_PUNCH_Y_OFFSET,
+  PUNK_ANIM_IDLE, PUNK_ANIM_WALK, PUNK_ANIM_ATTACK, PUNK_ANIM_HURT, PUNK_ANIM_DEATH,
 } from './EnemyConfig';
 import { ASSET_KEY_PUNK_IDLE } from '../assets/AssetKeys';
+import { registerPunkAnims }   from './EnemyAnimations';
 
 export interface RusherConfig {
   scene:        Phaser.Scene;
@@ -39,6 +41,7 @@ export class RusherController extends EnemyController {
   private _hitboxActive:  boolean = false;
 
   constructor(cfg: RusherConfig) {
+    registerPunkAnims(cfg.scene);
     const base: EnemyControllerConfig = {
       scene:           cfg.scene,
       id:              cfg.id,
@@ -55,6 +58,15 @@ export class RusherController extends EnemyController {
       knockdownFrames: RUSHER_KNOCKDOWN_FRAMES,
       combatSystem:    cfg.combatSystem,
       coordinator:     cfg.coordinator,
+      animKeys: {
+        [EnemyState.Idle]:      PUNK_ANIM_IDLE,
+        [EnemyState.Patrol]:    PUNK_ANIM_WALK,
+        [EnemyState.Aggro]:     PUNK_ANIM_WALK,
+        [EnemyState.Attack]:    PUNK_ANIM_ATTACK,
+        [EnemyState.Hurt]:      PUNK_ANIM_HURT,
+        [EnemyState.Knockdown]: PUNK_ANIM_HURT,
+        [EnemyState.Death]:     PUNK_ANIM_DEATH,
+      },
     };
     super(base);
     this._hitboxId = `rusher_${cfg.id}_flurry`;

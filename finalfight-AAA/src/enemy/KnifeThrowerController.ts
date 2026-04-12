@@ -16,8 +16,10 @@ import {
   KNIFE_THROWER_ATTACK_RANGE, KNIFE_THROW_COOLDOWN_FRAMES,
   KNIFE_THROWER_HURT_FRAMES, KNIFE_THROWER_KNOCKDOWN_FRAMES,
   KNIFE_THROWER_PATROL_SPEED, KNIFE_THROWER_THROW_STARTUP_FRAMES, KNIFE_THROWER_THROW_Y_OFFSET,
+  PUNK_ANIM_IDLE, PUNK_ANIM_WALK, PUNK_ANIM_ATTACK, PUNK_ANIM_HURT, PUNK_ANIM_DEATH,
 } from './EnemyConfig';
 import { ASSET_KEY_PUNK_IDLE } from '../assets/AssetKeys';
+import { registerPunkAnims }   from './EnemyAnimations';
 
 export interface KnifeThrowerConfig {
   scene:        Phaser.Scene;
@@ -34,6 +36,7 @@ export class KnifeThrowerController extends EnemyController {
   private _knives:      KnifeProjectile[] = [];
 
   constructor(cfg: KnifeThrowerConfig) {
+    registerPunkAnims(cfg.scene);
     const base: EnemyControllerConfig = {
       scene:           cfg.scene,
       id:              cfg.id,
@@ -50,6 +53,15 @@ export class KnifeThrowerController extends EnemyController {
       knockdownFrames: KNIFE_THROWER_KNOCKDOWN_FRAMES,
       combatSystem:    cfg.combatSystem,
       coordinator:     cfg.coordinator,
+      animKeys: {
+        [EnemyState.Idle]:      PUNK_ANIM_IDLE,
+        [EnemyState.Patrol]:    PUNK_ANIM_WALK,
+        [EnemyState.Aggro]:     PUNK_ANIM_WALK,
+        [EnemyState.Attack]:    PUNK_ANIM_ATTACK,
+        [EnemyState.Hurt]:      PUNK_ANIM_HURT,
+        [EnemyState.Knockdown]: PUNK_ANIM_HURT,
+        [EnemyState.Death]:     PUNK_ANIM_DEATH,
+      },
     };
     super(base);
   }

@@ -19,6 +19,7 @@ import { PlayerStateMachine } from './PlayerStateMachine';
 import { InputManager } from '../input/InputManager';
 import type { InputState } from '../input/InputState';
 import type { CombatSystem } from '../combat/CombatSystem';
+import type { HitEvent }     from '../combat/HitEvent';
 import {
   PLAYER_JAB_HITBOX_W,
   PLAYER_JAB_HITBOX_H,
@@ -264,6 +265,23 @@ export class PlayerController {
     } else {
       this._stateMachine.transition(PlayerState.Hurt);
     }
+  }
+
+  /**
+   * React to an enemy-dealt HitEvent: reduce HP, apply horizontal knockback,
+   * and transition to Hurt. No-op when invincibility frames are active.
+   *
+   * @spec enemy-attack-damage, FR-EB-14
+   * @implements FR-EB-10, FR-EB-11, FR-EB-14, FR-EB-15
+   */
+  applyHit(event: HitEvent): void {
+    if (this.iFramesRemaining > 0) return;
+
+    this.takeDamage(event.damage);
+
+    // Apply horizontal knockback in the attacker's facing direction.
+    const sign = event.attackerFacing === 'right' ? 1 : -1;
+    this.sprite.setVelocityX(sign * Math.abs(event.knockbackX));
   }
 
   /**

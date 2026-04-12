@@ -9,11 +9,13 @@ const mocks = vi.hoisted(() => {
     setVelocityY: vi.fn(),
     setCollideWorldBounds: vi.fn(),
     destroy: vi.fn(),
+    play: vi.fn(),
   };
   type CB = (...args: unknown[]) => void;
   const eventListeners: Map<string, Array<{ cb: CB; ctx: unknown }>> = new Map();
   const sceneMock = {
     physics: { add: { sprite: vi.fn(() => spriteMock) } },
+    add: { graphics: vi.fn(() => ({ setDepth: vi.fn(), clear: vi.fn(), fillStyle: vi.fn(), fillRect: vi.fn(), destroy: vi.fn() })) },
     events: {
       emit: vi.fn((name: string, ...args: unknown[]) => {
         eventListeners.get(name)?.forEach(({ cb, ctx }) => cb.call(ctx ?? cb, ...args));
@@ -30,6 +32,7 @@ const mocks = vi.hoisted(() => {
         }
       }),
     },
+    anims: { exists: vi.fn(() => true), create: vi.fn(), generateFrameNumbers: vi.fn(() => []) },
   };
   return { sceneMock, spriteMock, eventListeners };
 });

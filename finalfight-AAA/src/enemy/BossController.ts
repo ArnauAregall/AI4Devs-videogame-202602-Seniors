@@ -23,8 +23,10 @@ import {
   BOSS_HURT_FRAMES, BOSS_KNOCKDOWN_FRAMES,
   BOSS_ATTACK_STARTUP_FRAMES, BOSS_PUNCH_OFFSET_PX, BOSS_PUNCH_Y_OFFSET,
   BOSS_KICK_ALTERNATE_FRAMES,
+  PUNK_ANIM_IDLE, PUNK_ANIM_WALK, PUNK_ANIM_ATTACK, PUNK_ANIM_HURT, PUNK_ANIM_DEATH,
 } from './EnemyConfig';
 import { ASSET_KEY_PUNK_IDLE } from '../assets/AssetKeys';
+import { registerPunkAnims }   from './EnemyAnimations';
 
 export interface BossConfig {
   scene:        Phaser.Scene;
@@ -50,6 +52,7 @@ export class BossController extends EnemyController {
   get phase(): number { return this._phase; }
 
   constructor(cfg: BossConfig, onArrived?: () => void) {
+    registerPunkAnims(cfg.scene);
     const base: EnemyControllerConfig = {
       scene:           cfg.scene,
       id:              cfg.id,
@@ -66,6 +69,16 @@ export class BossController extends EnemyController {
       knockdownFrames: BOSS_KNOCKDOWN_FRAMES,
       combatSystem:    cfg.combatSystem,
       coordinator:     cfg.coordinator,
+      animKeys: {
+        [EnemyState.Idle]:      PUNK_ANIM_IDLE,
+        [EnemyState.Patrol]:    PUNK_ANIM_WALK,
+        [EnemyState.Aggro]:     PUNK_ANIM_WALK,
+        [EnemyState.Attack]:    PUNK_ANIM_ATTACK,
+        [EnemyState.Hurt]:      PUNK_ANIM_HURT,
+        [EnemyState.Knockdown]: PUNK_ANIM_HURT,
+        [EnemyState.Death]:     PUNK_ANIM_DEATH,
+      },
+      showHealthBar: false, // Boss uses HUD boss health bar instead. @spec FR-EB-26
     };
     super(base);
     this._hitboxId      = `boss_${cfg.id}_attack`;

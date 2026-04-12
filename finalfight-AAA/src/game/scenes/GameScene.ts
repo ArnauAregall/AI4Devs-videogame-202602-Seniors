@@ -141,6 +141,9 @@ export class GameScene extends Scene {
                     count:        this._comboCount,
                     windowActive: true,
                 });
+            } else if (_targetId === 'player' && event.teamTag === 'enemy') {
+                // Bridge enemy-team hit to the player controller. @spec FR-EB-14, enemy-attack-damage
+                this._player?.applyHit(event);
             }
         });
 

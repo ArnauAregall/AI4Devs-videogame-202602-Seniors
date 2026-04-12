@@ -6,6 +6,8 @@ const mocks = vi.hoisted(() => {
     x: 0, y: 0,
     setFlipX: vi.fn(),
     setDepth: vi.fn(),
+    setVelocityX: vi.fn(),
+    setVelocityY: vi.fn(),
     play: vi.fn(),
     anims: { setRepeat: vi.fn(), currentAnim: null },
     on: vi.fn(),
@@ -119,5 +121,42 @@ describe('PlayerHealth', () => {
     fsm.current = PlayerState.Knockdown;
     fsm.transition(PlayerState.GetUp);
     expect(controller.iFramesRemaining).toBe(GameConfig.GETUP_IFRAMES);
+  });
+
+  // ── FR-EB-10 to FR-EB-15: applyHit (enemy-to-player damage bridge) ───────
+
+  it('applyHit reduces player HP by event.damage', () => {
+    const hpBefore = controller.hp;
+    controller.applyHit({ damage: 10, knockbackX: 20, knockbackY: 0, hitStunFrames: 0, attackerFacing: 'right', teamTag: 'enemy', isGrab: false, isAoe: false });
+    expect(controller.hp).toBe(hpBefore - 10);
+  });
+
+  it('applyHit applies knockback velocity in attacker facing direction (right)', () => {
+    controller.applyHit({ damage: 5, knockbackX: 50, knockbackY: 0, hitStunFrames: 0, attackerFacing: 'right', teamTag: 'enemy', isGrab: false, isAoe: false });
+    expect(mocks.spriteMock.setVelocityX).toHaveBeenCalledWith(50);
+  });
+
+  it('applyHit applies knockback velocity in attacker facing direction (left)', () => {
+    controller.applyHit({ damage: 5, knockbackX: 50, knockbackY: 0, hitStunFrames: 0, attackerFacing: 'left', teamTag: 'enemy', isGrab: false, isAoe: false });
+    expect(mocks.spriteMock.setVelocityX).toHaveBeenCalledWith(-50);
+  });
+
+  it('applyHit is a no-op when iFramesRemaining > 0', () => {
+    controller.iFramesRemaining = 10;
+    const hpBefore = controller.hp;
+    controller.applyHit({ damage: 15, knockbackX: 30, knockbackY: 0, hitStunFrames: 0, attackerFacing: 'right', teamTag: 'enemy', isGrab: false, isAoe: false });
+    expect(controller.hp).toBe(hpBefore);
+  });
+
+  it('applyHit with lethal damage triggers game over via takeDamage', () => {
+    controller.lives = 0;
+    controller.applyHit({ damage: GameConfig.PLAYER_MAX_HP, knockbackX: 0, knockbackY: 0, hitStunFrames: 0, attackerFacing: 'right', teamTag: 'enemy', isGrab: false, isAoe: false });
+    expect(mocks.sceneMock.triggerGameOver).toHaveBeenCalledOnce();
+  });
+
+  it('applyHit damage of zero does not reduce HP', () => {
+    const hpBefore = controller.hp;
+    controller.applyHit({ damage: 0, knockbackX: 0, knockbackY: 0, hitStunFrames: 0, attackerFacing: 'right', teamTag: 'enemy', isGrab: false, isAoe: false });
+    expect(controller.hp).toBe(hpBefore);
   });
 });

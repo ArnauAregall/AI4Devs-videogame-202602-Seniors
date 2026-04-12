@@ -9,11 +9,13 @@ const mocks = vi.hoisted(() => {
     setVelocityY: vi.fn(),
     setCollideWorldBounds: vi.fn(),
     destroy:      vi.fn(),
+    play:         vi.fn(),
   };
   const sceneMock = {
     physics: { add: { sprite: vi.fn(() => spriteMock) } },
-    add:     { rectangle: vi.fn(() => ({ x: 0, y: 0, destroy: vi.fn() })) },
+    add:     { rectangle: vi.fn(() => ({ x: 0, y: 0, destroy: vi.fn() })), graphics: vi.fn(() => ({ setDepth: vi.fn(), clear: vi.fn(), fillStyle: vi.fn(), fillRect: vi.fn(), destroy: vi.fn() })) },
     events:  { emit: vi.fn(), on: vi.fn(), off: vi.fn() },
+    anims:   { exists: vi.fn(() => true), create: vi.fn(), generateFrameNumbers: vi.fn(() => []) },
   };
   return { sceneMock, spriteMock };
 });

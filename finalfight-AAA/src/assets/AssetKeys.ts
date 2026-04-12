@@ -39,6 +39,8 @@ export const ASSET_KEY_PUNK_IDLE   = 'punk-idle';
 export const ASSET_KEY_PUNK_WALK   = 'punk-walk';
 export const ASSET_KEY_PUNK_PUNCH  = 'punk-punch';
 export const ASSET_KEY_PUNK_HURT   = 'punk-hurt';
+// Placeholder — no source death sprite available; reuses hurt sheet until death asset is sourced
+export const ASSET_KEY_PUNK_DEATH  = 'punk-death';
 
 // ------------------------------------------------------------
 // Stage layers — Streets of Fight (source: streets-of-fight)
@@ -124,6 +126,8 @@ export const ASSET_PATH: Readonly<Record<string, string>> = {
   [ASSET_KEY_PUNK_WALK]:   'enemies/punk/punk-walk.png',
   [ASSET_KEY_PUNK_PUNCH]:  'enemies/punk/punk-punch.png',
   [ASSET_KEY_PUNK_HURT]:   'enemies/punk/punk-hurt.png',
+  // Placeholder: reuses hurt sheet until a dedicated death sprite is sourced
+  [ASSET_KEY_PUNK_DEATH]:  'enemies/punk/punk-hurt.png',
   // Stage layers — Streets of Fight
   [ASSET_KEY_STAGE_BACK]:     'stage/layers/stage-back.png',
   [ASSET_KEY_STAGE_FORE]:     'stage/layers/stage-fore.png',
@@ -183,6 +187,8 @@ export const ASSET_FRAME_CONFIG: Readonly<Record<string, FrameConfig>> = {
   [ASSET_KEY_PUNK_WALK]:  { frameWidth: 96, frameHeight: 63 }, // 4 frames (384÷96)
   [ASSET_KEY_PUNK_PUNCH]: { frameWidth: 96, frameHeight: 63 }, // 3 frames (288÷96)
   [ASSET_KEY_PUNK_HURT]:  { frameWidth: 96, frameHeight: 63 }, // 4 frames (384÷96)
+  // Placeholder: same dimensions as hurt (reuses hurt sheet)
+  [ASSET_KEY_PUNK_DEATH]: { frameWidth: 96, frameHeight: 63 }, // 4 frames (384÷96)
   // Cyberpunk decorations — 336×160 tileset; frame size TBD after visual inspection
   [ASSET_KEY_CYBERPUNK_DECORATIONS]: { frameWidth: 16, frameHeight: 16 }, // TODO: verify
 };

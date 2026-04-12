@@ -115,6 +115,37 @@ export const KNIFE_HIT_STUN   = 10;
 /** Debug visualisation colour for knife projectile. */
 export const KNIFE_PROJECTILE_DEBUG_COLOR = 0xffff00;
 
+// ── Punk animation clips ────────────────────────────────────────────────────
+
+/**
+ * Phaser animation keys for the Punk sprite sheets.
+ * Shared across all archetypes that use the punk art.
+ * @spec enemy-animation, FR-EB-01 through FR-EB-09
+ */
+export const PUNK_ANIM_IDLE   = 'punk-anim-idle';
+export const PUNK_ANIM_WALK   = 'punk-anim-walk';
+export const PUNK_ANIM_ATTACK = 'punk-anim-attack';
+export const PUNK_ANIM_HURT   = 'punk-anim-hurt';
+export const PUNK_ANIM_DEATH  = 'punk-anim-death';
+
+/** Frame counts per punk animation clip. */
+export const PUNK_ANIM_IDLE_FRAMES   = 4;
+export const PUNK_ANIM_WALK_FRAMES   = 4;
+export const PUNK_ANIM_ATTACK_FRAMES = 3;
+export const PUNK_ANIM_HURT_FRAMES   = 4;
+export const PUNK_ANIM_DEATH_FRAMES  = 4;
+
+/** Frame rates (fps) per punk animation clip. */
+export const PUNK_ANIM_IDLE_FPS   = 8;
+export const PUNK_ANIM_WALK_FPS   = 10;
+export const PUNK_ANIM_ATTACK_FPS = 12;
+export const PUNK_ANIM_HURT_FPS   = 12;
+export const PUNK_ANIM_DEATH_FPS  = 8;
+
+/** Active-frame window for the punch clip (inclusive tick indices). @spec FR-EB-12 */
+export const PUNK_ATTACK_ACTIVE_FRAME_START = 1;
+export const PUNK_ATTACK_ACTIVE_FRAME_END   = 2;
+
 // ── Boss ─────────────────────────────────────────────────────────────────────
 
 /** @spec FR-EA-20, FR-EA-24 */

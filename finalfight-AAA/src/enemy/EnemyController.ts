@@ -14,6 +14,7 @@ import { HitEvent }                    from '../combat/HitEvent';
 import { AttackerCoordinator }         from './AttackerCoordinator';
 import { EnemyState }                  from './EnemyState';
 import { EnemyStateMachine }           from './EnemyStateMachine';
+import { EnemyHealthBar }              from './EnemyHealthBar';
 import {
   ENEMY_HURTBOX_W, ENEMY_HURTBOX_H, ENEMY_BODY_HALF_H,
   KNOCKDOWN_THRESHOLD, DEATH_LINGER_FRAMES,
@@ -36,6 +37,16 @@ export interface EnemyControllerConfig {
   knockdownFrames:     number;
   combatSystem:        CombatSystem;
   coordinator:         AttackerCoordinator;
+  /**
+   * Animation clip key for each EnemyState. When provided, the matching clip
+   * plays automatically on every state entry. @spec FR-EB-06
+   */
+  animKeys?:           Readonly<Partial<Record<EnemyState, string>>>;
+  /**
+   * Set to false to suppress the world-space health bar (e.g. for the Boss,
+   * which uses the HUD boss health bar instead). Defaults to true. @spec FR-EB-26
+   */
+  showHealthBar?:      boolean;
 }
 
 export abstract class EnemyController {
@@ -53,6 +64,11 @@ export abstract class EnemyController {
   protected readonly _knockdownFrames: number;
   protected readonly _combatSystem: CombatSystem;
   protected readonly _coordinator:  AttackerCoordinator;
+
+  /** @spec FR-EB-06 */
+  private readonly   _animKeys:     Readonly<Partial<Record<EnemyState, string>>>;
+  /** @spec FR-EB-20 */
+  private            _healthBar:    EnemyHealthBar | null;
 
   protected _fsm:                   EnemyStateMachine;
   protected _stateTimer:            number = 0;
@@ -93,6 +109,11 @@ export abstract class EnemyController {
     this._sprite.setDepth(GameConfig.ENTITY_DEPTH);
     this._sprite.setFlipX(!cfg.facingRight);
 
+    this._animKeys   = cfg.animKeys ?? {};
+    this._healthBar  = (cfg.showHealthBar !== false)
+      ? new EnemyHealthBar(cfg.scene)
+      : null;
+
     this._hurtboxId   = `enemy_${cfg.id}`;
     this._onHitBound  = this._dispatchedHit.bind(this);
 
@@ -124,6 +145,9 @@ export abstract class EnemyController {
     const hb = this._combatSystem.getHurtbox(this._hurtboxId);
     if (hb) hb.update(this._sprite.x, this._sprite.y - ENEMY_BODY_HALF_H);
 
+    // Update world-space health bar. @spec FR-EB-21, NFR-EB-03
+    this._healthBar?.update(this._hp, this._maxHp, this._sprite.x, this._sprite.y);
+
     if (this._frozen) return;
 
     this._stateTimer++;
@@ -137,6 +161,9 @@ export abstract class EnemyController {
       case EnemyState.Knockdown: this._tickKnockdown();              break;
       case EnemyState.Death:     this._tickDeath();                  break;
     }
+
+    // Apply facing flip every tick AFTER state methods may have updated _facingRight. @spec FR-EB-07
+    this._sprite.setFlipX(!this._facingRight);
   }
 
   freeze():   void { this._frozen = true; }
@@ -146,6 +173,8 @@ export abstract class EnemyController {
     this._releaseToken();
     this._combatSystem.offHit(this._onHitBound);
     this._combatSystem.removeHurtbox(this._hurtboxId);
+    this._healthBar?.destroy();
+    this._healthBar = null;
     this._sprite.destroy();
   }
 
@@ -153,6 +182,11 @@ export abstract class EnemyController {
 
   protected _onEnterState(state: EnemyState): void {
     this._stateTimer = 0;
+
+    // Play the animation clip registered for this state. @spec FR-EB-06
+    const clipKey = this._animKeys[state];
+    if (clipKey) this._sprite.play(clipKey, true);
+
     switch (state) {
       case EnemyState.Idle:
         this._sprite.setVelocityX(0);
@@ -174,6 +208,9 @@ export abstract class EnemyController {
         this._lingerTimer = 0;
         this._releaseToken();
         this._combatSystem.removeHurtbox(this._hurtboxId);
+        // Destroy health bar on death. @spec FR-EB-22
+        this._healthBar?.destroy();
+        this._healthBar = null;
         this._onEnterDeath();
         break;
     }
@@ -207,7 +244,6 @@ export abstract class EnemyController {
     this._sprite.setVelocityX(dir * this._patrolSpeed);
     if (this._stateTimer > ENEMY_PATROL_FLIP_FRAMES) {
       this._facingRight = !this._facingRight;
-      this._sprite.setFlipX(!this._facingRight);
       this._fsm.transition(EnemyState.Idle);
     }
   }
@@ -217,7 +253,6 @@ export abstract class EnemyController {
     const dist = Math.abs(dx);
 
     this._facingRight = dx >= 0;
-    this._sprite.setFlipX(!this._facingRight);
 
     if (dist <= this._attackRange) {
       if (this._coordinator.requestAttackToken()) {

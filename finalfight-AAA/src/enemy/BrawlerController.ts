@@ -8,6 +8,7 @@ import Phaser from 'phaser';
 import { CombatSystem }        from '../combat/CombatSystem';
 import { AttackerCoordinator } from './AttackerCoordinator';
 import { EnemyController, EnemyControllerConfig } from './EnemyController';
+import { EnemyState }          from './EnemyState';
 import {
   BRAWLER_MAX_HP, BRAWLER_PATROL_SPEED, BRAWLER_WALK_SPEED,
   BRAWLER_AGGRO_RADIUS, BRAWLER_ATTACK_RANGE,
@@ -16,8 +17,10 @@ import {
   BRAWLER_ATTACK_ACTIVE_TICKS, BRAWLER_ATTACK_COOLDOWN_TICKS,
   BRAWLER_HURT_FRAMES, BRAWLER_KNOCKDOWN_FRAMES,
   BRAWLER_ATTACK_STARTUP_FRAMES, BRAWLER_PUNCH_OFFSET_PX, BRAWLER_PUNCH_Y_OFFSET,
+  PUNK_ANIM_IDLE, PUNK_ANIM_WALK, PUNK_ANIM_ATTACK, PUNK_ANIM_HURT, PUNK_ANIM_DEATH,
 } from './EnemyConfig';
 import { ASSET_KEY_PUNK_IDLE } from '../assets/AssetKeys';
+import { registerPunkAnims }   from './EnemyAnimations';
 
 export interface BrawlerConfig {
   scene:        Phaser.Scene;
@@ -35,6 +38,7 @@ export class BrawlerController extends EnemyController {
   private _hitboxActive:  boolean = false;
 
   constructor(cfg: BrawlerConfig) {
+    registerPunkAnims(cfg.scene);
     const base: EnemyControllerConfig = {
       scene:           cfg.scene,
       id:              cfg.id,
@@ -51,6 +55,15 @@ export class BrawlerController extends EnemyController {
       knockdownFrames: BRAWLER_KNOCKDOWN_FRAMES,
       combatSystem:    cfg.combatSystem,
       coordinator:     cfg.coordinator,
+      animKeys: {
+        [EnemyState.Idle]:      PUNK_ANIM_IDLE,
+        [EnemyState.Patrol]:    PUNK_ANIM_WALK,
+        [EnemyState.Aggro]:     PUNK_ANIM_WALK,
+        [EnemyState.Attack]:    PUNK_ANIM_ATTACK,
+        [EnemyState.Hurt]:      PUNK_ANIM_HURT,
+        [EnemyState.Knockdown]: PUNK_ANIM_HURT,
+        [EnemyState.Death]:     PUNK_ANIM_DEATH,
+      },
     };
     super(base);
     this._hitboxId = `brawler_${cfg.id}_punch`;
