@@ -9,6 +9,7 @@ const mocks = vi.hoisted(() => {
     alpha: 1,
     active: true,
     setDepth: vi.fn(),
+    setScale: vi.fn(),
     destroy: vi.fn(() => { spriteMock.active = false; }),
   };
 

@@ -51,6 +51,7 @@ export class ItemPickup {
       textureKey,
     );
     this._sprite.setDepth(7);
+    this._sprite.setScale(0.5);
 
     this._fixedUpdateBound = this._fixedUpdate.bind(this);
     scene.registerFixedUpdate(this._fixedUpdateBound);
