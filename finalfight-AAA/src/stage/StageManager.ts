@@ -189,9 +189,11 @@ export class StageManager {
   private _clampPlayer(player: PlayerController | null): void {
     if (!player) return;
     const hw = GameConfig.PLAYER_BODY_HALF_WIDTH;
-    const minScreenX = hw;
-    const maxScreenX = GameConfig.CANVAS_WIDTH - hw;
-    player.sprite.x = Phaser.Math.Clamp(player.sprite.x, minScreenX, maxScreenX);
+    // Clamp to the visible screen area: account for camera offset so the
+    // player cannot walk off either edge regardless of how far the camera has scrolled.
+    const minWorldX = this._cameraX + hw;
+    const maxWorldX = this._cameraX + GameConfig.CANVAS_WIDTH - hw;
+    player.sprite.x = Phaser.Math.Clamp(player.sprite.x, minWorldX, maxWorldX);
   }
 
   destroy(): void {
