@@ -52,6 +52,7 @@ export const stage1Data: StageData = {
     {
       id: 'zone-1c',
       entries: [
+        { archetype: 'boss',          count: 1, staggerDelayMs: 0   },
         { archetype: 'brawler',       count: 2, staggerDelayMs: 300 },
         { archetype: 'rusher',        count: 1, staggerDelayMs: 500 },
         { archetype: 'knife-thrower', count: 1, staggerDelayMs: 800 },
