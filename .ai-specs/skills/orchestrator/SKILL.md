@@ -69,6 +69,7 @@ OpenSpec proposal. Violation halts the skill immediately with a BUILD ORDER ERRO
 | 4 | combat-system | player, stage |
 | 5 | enemy-ai | combat-system, stage |
 | 6 | hud | player, enemy-ai, combat-system |
+| 7 | go-live-qa | hud, enemy-ai, combat-system, stage, player, game-loop |
 
 ---
 
@@ -87,7 +88,7 @@ Extract the subsystem name from the input file path. The subsystem name is the
 stem of the filename: `finalfight-AAA/requirements/player.md` → `player`.
 Valid values: `game-loop`, `player`, `stage`, `combat-system`, `enemy-ai`, `hud`.
 If the value is not in this list, halt with: `ORCHESTRATOR ERROR: unknown subsystem
-"[name]". Valid subsystems: game-loop, player, stage, combat-system, enemy-ai, hud.`
+"[name]". Valid subsystems: game-loop, player, stage, combat-system, enemy-ai, hud, go-live-qa.`
 
 **P0-3 — Dependency gate:**
 Look up the subsystem in the Build Order table. For each declared dependency:
