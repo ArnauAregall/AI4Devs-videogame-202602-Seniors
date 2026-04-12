@@ -51,7 +51,7 @@ export class SpawnController {
         this.scene.time.addEvent({
           delay: cumulativeDelay,
           callback: () => {
-            this.scene.events.emit('enemySpawn', { archetype, x: spawnX, y: spawnY });
+            this.scene.events.emit('enemySpawn', { type: archetype, x: spawnX, y: spawnY });
           },
         });
       }

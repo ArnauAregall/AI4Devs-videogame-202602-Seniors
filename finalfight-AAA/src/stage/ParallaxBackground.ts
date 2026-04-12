@@ -28,6 +28,9 @@ export class ParallaxBackground {
       const ts = scene.add.tileSprite(0, 0, width, height, def.textureKey);
       ts.setOrigin(0, 0);
       ts.setDepth(def.depth);
+      // Fix the tile sprite to the camera so camera scrollX doesn't move it off-screen.
+      // Parallax is achieved by adjusting tilePositionX directly in _fixedUpdate.
+      ts.setScrollFactor(0);
       this._layers.push({ tileSprite: ts, speedFactor: def.speedFactor });
     }
 

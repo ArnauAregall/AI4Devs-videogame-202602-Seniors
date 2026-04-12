@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => {
     depth: number;
     setOrigin: ReturnType<typeof vi.fn>;
     setDepth: ReturnType<typeof vi.fn>;
+    setScrollFactor: ReturnType<typeof vi.fn>;
     destroy: ReturnType<typeof vi.fn>;
   }> = [];
 
@@ -20,6 +21,7 @@ const mocks = vi.hoisted(() => {
           depth: 0,
           setOrigin: vi.fn(),
           setDepth: vi.fn((d: number) => { ts.depth = d; }),
+          setScrollFactor: vi.fn(),
           destroy: vi.fn(),
         };
         tileSpriteInstances.push(ts);
@@ -66,6 +68,7 @@ describe('ParallaxBackground', () => {
           depth: 0,
           setOrigin: vi.fn(),
           setDepth: vi.fn((d: number) => { ts.depth = d; }),
+          setScrollFactor: vi.fn(),
           destroy: vi.fn(),
         };
         mocks.tileSpriteInstances.push(ts);

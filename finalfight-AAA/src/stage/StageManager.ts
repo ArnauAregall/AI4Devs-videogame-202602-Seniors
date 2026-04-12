@@ -93,8 +93,9 @@ export class StageManager {
     const prevCameraX = this._cameraX;
 
     if (!this._locked && player) {
-      // Advance camera rightward toward player (one-way: never move left)
-      const target = player.sprite.x + this._cameraX - GameConfig.CANVAS_WIDTH / 2;
+      // Advance camera rightward toward player (one-way: never move left).
+      // target is the scrollX needed to centre the player: worldX - halfCanvas.
+      const target = player.sprite.x - GameConfig.CANVAS_WIDTH / 2;
       if (target > this._cameraX) {
         const speed = GameConfig.CAMERA_MAX_SCROLL_SPEED / GameConfig.TARGET_FPS;
         this._cameraX = Math.min(

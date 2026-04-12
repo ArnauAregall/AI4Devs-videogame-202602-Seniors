@@ -39,19 +39,19 @@ export const stage1Data: StageData = {
     {
       id: 'zone-1a',
       entries: [
-        { archetype: 'punk', count: 2, staggerDelayMs: 500 },
+        { archetype: 'brawler', count: 2, staggerDelayMs: 500 },
       ],
     },
     {
       id: 'zone-1b',
       entries: [
-        { archetype: 'punk', count: 3, staggerDelayMs: 400 },
+        { archetype: 'brawler', count: 3, staggerDelayMs: 400 },
       ],
     },
     {
       id: 'zone-1c',
       entries: [
-        { archetype: 'punk', count: 4, staggerDelayMs: 300 },
+        { archetype: 'brawler', count: 4, staggerDelayMs: 300 },
       ],
     },
   ],

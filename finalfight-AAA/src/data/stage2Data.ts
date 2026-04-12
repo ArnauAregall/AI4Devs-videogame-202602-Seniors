@@ -38,26 +38,26 @@ export const stage2Data: StageData = {
     {
       id: 'zone-2a',
       entries: [
-        { archetype: 'punk', count: 3, staggerDelayMs: 450 },
+        { archetype: 'brawler', count: 3, staggerDelayMs: 450 },
       ],
     },
     {
       id: 'zone-2b',
       entries: [
-        { archetype: 'punk', count: 3, staggerDelayMs: 350 },
-        { archetype: 'punk', count: 2, staggerDelayMs: 600 },
+        { archetype: 'brawler', count: 3, staggerDelayMs: 350 },
+        { archetype: 'brawler', count: 2, staggerDelayMs: 600 },
       ],
     },
     {
       id: 'zone-2c',
       entries: [
-        { archetype: 'punk', count: 4, staggerDelayMs: 300 },
+        { archetype: 'brawler', count: 4, staggerDelayMs: 300 },
       ],
     },
     {
       id: 'zone-2d',
       entries: [
-        { archetype: 'punk', count: 5, staggerDelayMs: 250 },
+        { archetype: 'brawler', count: 5, staggerDelayMs: 250 },
       ],
     },
   ],

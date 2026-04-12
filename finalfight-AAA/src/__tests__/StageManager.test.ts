@@ -8,6 +8,7 @@ const mocks = vi.hoisted(() => {
     tilePositionX: number;
     setOrigin: ReturnType<typeof vi.fn>;
     setDepth: ReturnType<typeof vi.fn>;
+    setScrollFactor: ReturnType<typeof vi.fn>;
     destroy: ReturnType<typeof vi.fn>;
   }> = [];
 
@@ -40,6 +41,7 @@ const mocks = vi.hoisted(() => {
           tilePositionX: 0,
           setOrigin: vi.fn(),
           setDepth: vi.fn(),
+          setScrollFactor: vi.fn(),
           destroy: vi.fn(),
         };
         tileSpriteInstances.push(ts);
