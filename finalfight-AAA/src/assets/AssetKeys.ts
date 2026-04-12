@@ -13,6 +13,9 @@
 // Player — Brawler Girl (source: streets-of-fight)
 // ------------------------------------------------------------
 
+// Player — Brawler Girl (source: streets-of-fight)
+// Verified frame size: 96×63 px (all 9 spritesheets share the same height)
+
 export const ASSET_KEY_PLAYER_IDLE       = 'player-idle';
 export const ASSET_KEY_PLAYER_WALK       = 'player-walk';
 export const ASSET_KEY_PLAYER_JUMP       = 'player-jump';
@@ -22,6 +25,11 @@ export const ASSET_KEY_PLAYER_KICK       = 'player-kick';
 export const ASSET_KEY_PLAYER_JUMP_KICK  = 'player-jump-kick';
 export const ASSET_KEY_PLAYER_DIVE_KICK  = 'player-dive-kick';
 export const ASSET_KEY_PLAYER_HURT       = 'player-hurt';
+// Missing animations — no source sprite available; use hurt as placeholder until assets arrive
+export const ASSET_KEY_PLAYER_KNOCKDOWN  = 'player-knockdown';
+export const ASSET_KEY_PLAYER_GETUP      = 'player-getup';
+export const ASSET_KEY_PLAYER_GRAB       = 'player-grab';
+export const ASSET_KEY_PLAYER_SPECIAL    = 'player-special';
 
 // ------------------------------------------------------------
 // Enemy — Punk archetype (source: streets-of-fight)
@@ -98,6 +106,11 @@ export const ASSET_PATH: Readonly<Record<string, string>> = {
   [ASSET_KEY_PLAYER_JUMP_KICK]:  'player/player-jump-kick.png',
   [ASSET_KEY_PLAYER_DIVE_KICK]:  'player/player-dive-kick.png',
   [ASSET_KEY_PLAYER_HURT]:       'player/player-hurt.png',
+  // Placeholder paths — reuse hurt.png until dedicated assets are sourced (assets.md Open Questions 1–4)
+  [ASSET_KEY_PLAYER_KNOCKDOWN]:  'player/player-hurt.png',
+  [ASSET_KEY_PLAYER_GETUP]:      'player/player-hurt.png',
+  [ASSET_KEY_PLAYER_GRAB]:       'player/player-hurt.png',
+  [ASSET_KEY_PLAYER_SPECIAL]:    'player/player-hurt.png',
   // Enemy Punk
   [ASSET_KEY_PUNK_IDLE]:   'enemies/punk/punk-idle.png',
   [ASSET_KEY_PUNK_WALK]:   'enemies/punk/punk-walk.png',
@@ -142,17 +155,21 @@ export interface FrameConfig {
 }
 
 export const ASSET_FRAME_CONFIG: Readonly<Record<string, FrameConfig>> = {
-  // Player — Brawler Girl
-  // Idle: 4 frames — TODO: measure source PNG once provisioned
-  [ASSET_KEY_PLAYER_IDLE]:      { frameWidth: 80, frameHeight: 80 }, // TODO: verify
-  [ASSET_KEY_PLAYER_WALK]:      { frameWidth: 80, frameHeight: 80 }, // TODO: verify
-  [ASSET_KEY_PLAYER_JUMP]:      { frameWidth: 80, frameHeight: 80 }, // TODO: verify
-  [ASSET_KEY_PLAYER_JAB]:       { frameWidth: 80, frameHeight: 80 }, // TODO: verify
-  [ASSET_KEY_PLAYER_PUNCH]:     { frameWidth: 80, frameHeight: 80 }, // TODO: verify
-  [ASSET_KEY_PLAYER_KICK]:      { frameWidth: 80, frameHeight: 80 }, // TODO: verify
-  [ASSET_KEY_PLAYER_JUMP_KICK]: { frameWidth: 80, frameHeight: 80 }, // TODO: verify
-  [ASSET_KEY_PLAYER_DIVE_KICK]: { frameWidth: 80, frameHeight: 80 }, // TODO: verify
-  [ASSET_KEY_PLAYER_HURT]:      { frameWidth: 80, frameHeight: 80 }, // TODO: verify
+  // Player — Brawler Girl (verified: 96×63 px per frame)
+  [ASSET_KEY_PLAYER_IDLE]:      { frameWidth: 96, frameHeight: 63 },  // 4 frames
+  [ASSET_KEY_PLAYER_WALK]:      { frameWidth: 96, frameHeight: 63 },  // 10 frames
+  [ASSET_KEY_PLAYER_JUMP]:      { frameWidth: 96, frameHeight: 63 },  // 4 frames
+  [ASSET_KEY_PLAYER_JAB]:       { frameWidth: 96, frameHeight: 63 },  // 3 frames
+  [ASSET_KEY_PLAYER_PUNCH]:     { frameWidth: 96, frameHeight: 63 },  // 3 frames
+  [ASSET_KEY_PLAYER_KICK]:      { frameWidth: 96, frameHeight: 63 },  // 5 frames
+  [ASSET_KEY_PLAYER_JUMP_KICK]: { frameWidth: 96, frameHeight: 63 },  // 3 frames
+  [ASSET_KEY_PLAYER_DIVE_KICK]: { frameWidth: 96, frameHeight: 63 },  // 5 frames
+  [ASSET_KEY_PLAYER_HURT]:      { frameWidth: 96, frameHeight: 63 },  // 2 frames
+  // Placeholder fallback keys — mapped to hurt.png until real assets arrive
+  [ASSET_KEY_PLAYER_KNOCKDOWN]: { frameWidth: 96, frameHeight: 63 },
+  [ASSET_KEY_PLAYER_GETUP]:     { frameWidth: 96, frameHeight: 63 },
+  [ASSET_KEY_PLAYER_GRAB]:      { frameWidth: 96, frameHeight: 63 },
+  [ASSET_KEY_PLAYER_SPECIAL]:   { frameWidth: 96, frameHeight: 63 },
   // Enemy Punk
   [ASSET_KEY_PUNK_IDLE]:  { frameWidth: 80, frameHeight: 80 }, // TODO: verify
   [ASSET_KEY_PUNK_WALK]:  { frameWidth: 80, frameHeight: 80 }, // TODO: verify

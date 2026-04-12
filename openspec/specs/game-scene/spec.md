@@ -51,3 +51,14 @@ The system SHALL configure Phaser Scale Manager to support both a fixed-size can
 - **WHEN** `GameConfig.SCALE_MODE` is `'FIT'` and the browser window is resized
 - **THEN** the canvas scales to fit within the window while preserving the aspect ratio defined by `CANVAS_WIDTH / CANVAS_HEIGHT`
 
+### Requirement: GameScene exposes a getPlayer() accessor
+The system SHALL add `getPlayer(): PlayerController | null` to `GameScene`. It returns the current player instance or `null` before the player is created.
+
+#### Scenario: getPlayer returns the instance after create
+- **WHEN** `GameScene.create()` completes
+- **THEN** `gameScene.getPlayer()` returns a non-null `PlayerController`
+
+#### Scenario: getPlayer returns null before create
+- **WHEN** `GameScene` is constructed but `create()` has not yet run
+- **THEN** `gameScene.getPlayer()` returns `null`
+

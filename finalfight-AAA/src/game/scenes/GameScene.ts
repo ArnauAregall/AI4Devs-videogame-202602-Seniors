@@ -1,5 +1,6 @@
 import { Scene } from 'phaser';
 import { GameConfig } from '../../config/GameConfig';
+import { PlayerController } from '../../player/PlayerController';
 
 type FixedUpdateFn = (dt: number) => void;
 
@@ -7,16 +8,29 @@ export class GameScene extends Scene {
     private _accumulator: number = 0;
     private _fixedCallbacks: Set<FixedUpdateFn> = new Set();
 
+    /** @spec game-scene – Requirement: getPlayer() accessor */
+    private _player: PlayerController | null = null;
+
+    /** Physics group for all player attack hitboxes. Queried by combat-system. */
+    playerHitboxGroup!: Phaser.Physics.Arcade.StaticGroup;
+
     constructor() {
         super('GameScene');
     }
 
     create(): void {
+        // Hitbox group for player attacks (combat-system queries this group)
+        this.playerHitboxGroup = this.physics.add.staticGroup();
+
         // Pause input
         this.input.keyboard?.on('keydown-ESC', () => this.pauseGame());
         this.input.keyboard?.on('keydown-P', () => this.pauseGame());
 
-        // TODO(player): register player fixed-update callback here
+        // Spawn player at centre of ground plane
+        const spawnX = GameConfig.CANVAS_WIDTH / 2;
+        const spawnY = (GameConfig.GROUND_TOP + GameConfig.GROUND_BOTTOM) / 2;
+        this._player = new PlayerController(this, spawnX, spawnY);
+
         // TODO(stage): register stage fixed-update callback here
         // TODO(combat): register combat fixed-update callback here
         // TODO(enemy-ai): register enemy-ai fixed-update callback here
@@ -65,5 +79,23 @@ export class GameScene extends Scene {
         this._accumulator = 0;
         this.scene.resume();
         this.sound.resumeAll();
+    }
+
+    /**
+     * Returns the active PlayerController, or null if not yet created.
+     * @spec game-scene – Requirement: getPlayer() accessor
+     */
+    getPlayer(): PlayerController | null {
+        return this._player;
+    }
+
+    /**
+     * Pause the game scene and launch the Game Over screen.
+     * Called by PlayerController when the player exhausts all lives.
+     * @spec player-health – Requirement: Last life lost triggers Game Over
+     */
+    triggerGameOver(): void {
+        this.scene.pause();
+        this.scene.launch('GameOverScene');
     }
 }
