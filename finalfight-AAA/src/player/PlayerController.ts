@@ -410,7 +410,7 @@ export class PlayerController {
     // compounds with the position delta each frame and makes movement appear very
     // slow. Clear it here whenever we are not actively in a knockback state so
     // the two systems never fight each other.
-    if (!inKnockback) {
+    if (!inKnockback && this.sprite.body) {
       this.sprite.setVelocityX(0);
       this.sprite.setVelocityY(0);
     }
