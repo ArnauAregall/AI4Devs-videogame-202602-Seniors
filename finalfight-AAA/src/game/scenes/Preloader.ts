@@ -27,7 +27,7 @@ export class Preloader extends Scene {
     }
 
     private loadAssets(): void {
-        this.load.setPath('');
+        this.load.setPath('assets');
 
         for (const [key, path] of Object.entries(ASSET_PATH)) {
             const frameConfig = ASSET_FRAME_CONFIG[key as keyof typeof ASSET_FRAME_CONFIG];

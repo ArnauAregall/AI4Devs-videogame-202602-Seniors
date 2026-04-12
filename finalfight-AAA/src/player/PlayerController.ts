@@ -221,8 +221,12 @@ export class PlayerController {
       );
     }
 
-    // Play initial animation
-    this.sprite.play(ASSET_KEY_PLAYER_IDLE, true);
+    // Play initial animation — guarded: if textures failed to load the key will be absent.
+    if (this._scene.anims.exists(ASSET_KEY_PLAYER_IDLE)) {
+      this.sprite.play(ASSET_KEY_PLAYER_IDLE, true);
+    } else {
+      console.warn(`[PlayerController] Animation key "${ASSET_KEY_PLAYER_IDLE}" not found — skipping initial play(). Check asset loading.`);
+    }
   }
 
   // ── Fixed-tick entry point ────────────────────────────────────────────────
