@@ -57,7 +57,9 @@ export class PauseOverlay extends Scene {
         }).setOrigin(0.5).setVisible(false);
 
         this._cursor = 0;
-        this._refresh();
+        // Defer first _refresh so Phaser's WebGL canvas texture is fully
+        // initialised before setColor triggers a redraw (prevents null drawImage crash).
+        this.time.delayedCall(0, () => this._refresh());
 
         // Keyboard navigation
         this.input.keyboard?.on('keydown-UP',    () => { this._move(-1); });

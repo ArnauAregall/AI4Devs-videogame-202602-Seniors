@@ -78,7 +78,9 @@ export class GameOver extends Scene {
         this.input.keyboard?.on('keydown-DOWN',  () => { this._cursor = (this._cursor + 1) % this._options.length; this._refresh(); });
         this.input.keyboard?.on('keydown-ENTER', () => this._activate());
 
-        this._refresh();
+        // Defer first _refresh so Phaser's WebGL canvas texture is fully
+        // initialised before setColor triggers a redraw (prevents null drawImage crash).
+        this.time.delayedCall(0, () => this._refresh());
     }
 
     private _refresh(): void {

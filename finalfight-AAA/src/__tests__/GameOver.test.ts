@@ -32,6 +32,7 @@ vi.mock('phaser', () => {
         scale = { width: 384, height: 224 };
         cameras = { main: { setBackgroundColor: vi.fn() } };
         input: { keyboard: ReturnType<typeof makeKeyboardMock> | null } = { keyboard: makeKeyboardMock() };
+        time = { delayedCall: vi.fn((_delay: number, cb: () => void) => cb()) };
         scene = {
             stop: vi.fn(), start: vi.fn(), get: vi.fn().mockReturnValue({ resumeAfterContinue: vi.fn() }),
             launch: vi.fn(),
