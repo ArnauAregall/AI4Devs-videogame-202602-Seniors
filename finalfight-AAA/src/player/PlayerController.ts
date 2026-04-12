@@ -402,7 +402,18 @@ export class PlayerController {
     const s     = this._stateMachine.current;
     const spd   = GameConfig.PLAYER_WALK_SPEED / GameConfig.TARGET_FPS;
 
-    const inJump = s === PlayerState.Jump || s === PlayerState.JumpAttack;
+    const inJump      = s === PlayerState.Jump || s === PlayerState.JumpAttack;
+    const inKnockback = s === PlayerState.Hurt || s === PlayerState.Knockdown;
+
+    // Walking and jump-arc movement use direct position manipulation, not Arcade
+    // physics velocity. Any residual velocity left from a knockback (setVelocityX)
+    // compounds with the position delta each frame and makes movement appear very
+    // slow. Clear it here whenever we are not actively in a knockback state so
+    // the two systems never fight each other.
+    if (!inKnockback) {
+      this.sprite.setVelocityX(0);
+      this.sprite.setVelocityY(0);
+    }
 
     if (!inJump) {
       // Horizontal movement (x axis)

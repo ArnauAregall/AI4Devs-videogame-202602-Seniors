@@ -7,6 +7,8 @@ const mocks = vi.hoisted(() => {
     setFlipX: vi.fn(),
     setDepth: vi.fn(),
     play: vi.fn(),
+    setVelocityX: vi.fn(),
+    setVelocityY: vi.fn(),
     anims: { setRepeat: vi.fn(), currentAnim: null },
     on: vi.fn(),
     off: vi.fn(),

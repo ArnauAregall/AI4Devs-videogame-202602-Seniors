@@ -14,6 +14,8 @@ export function buildPhaserMock() {
     x: 0, y: 0,
     setFlipX: vi.fn(),
     setPosition: vi.fn(),
+    setVelocityX: vi.fn(),
+    setVelocityY: vi.fn(),
     play: vi.fn(),
     anims: {
       setRepeat: vi.fn(),
