@@ -5,6 +5,7 @@ import { StageManager } from '../../stage/StageManager';
 import { stage1Data } from '../../data/stage1Data';
 import { CombatSystem } from '../../combat/CombatSystem';
 import { DebugRenderer } from '../../combat/DebugRenderer';
+import { EnemyManager } from '../../enemy/EnemyManager';
 
 type FixedUpdateFn = (dt: number) => void;
 
@@ -20,6 +21,9 @@ export class GameScene extends Scene {
 
     /** @spec game-scene – Requirement: getCombatSystem() accessor */
     private _combatSystem: CombatSystem | null = null;
+
+    /** @spec enemy-manager – Requirement: getEnemyManager() accessor */
+    private _enemyManager: EnemyManager | null = null;
 
     private _debugRenderer: DebugRenderer | null = null;
 
@@ -56,7 +60,17 @@ export class GameScene extends Scene {
         const spawnY = (GameConfig.GROUND_TOP + GameConfig.GROUND_BOTTOM) / 2;
         this._player = new PlayerController(this, spawnX, spawnY, null, this._combatSystem);
 
-        // TODO(enemy-ai): register enemy-ai fixed-update callback here
+        // Enemy manager — must be registered AFTER CombatSystem so CS runs first each tick
+        this._enemyManager = new EnemyManager(
+            this,
+            this._combatSystem,
+            () => {
+                const p = this._player;
+                return p ? { x: p.sprite.x, y: p.sprite.y } : { x: spawnX, y: spawnY };
+            },
+        );
+        this.registerFixedUpdate(this._enemyManager.fixedUpdate.bind(this._enemyManager));
+
         // TODO(hud): register hud fixed-update callback here
 
         // Stage subsystem — initialise after player so StageManager can call getPlayer()
@@ -132,6 +146,14 @@ export class GameScene extends Scene {
      */
     getCombatSystem(): CombatSystem | null {
         return this._combatSystem;
+    }
+
+    /**
+     * Returns the active EnemyManager, or null if not yet created.
+     * @spec enemy-manager
+     */
+    getEnemyManager(): EnemyManager | null {
+        return this._enemyManager;
     }
 
     /**

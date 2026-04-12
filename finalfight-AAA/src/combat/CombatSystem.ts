@@ -180,6 +180,14 @@ export class CombatSystem {
     return this._hurtboxes;
   }
 
+  /**
+   * Manually dispatch a HitEvent to all registered onHit listeners.
+   * Used by KnifeProjectile which manages its own collision geometry.
+   */
+  dispatchHit(targetId: string, event: HitEvent): void {
+    this._dispatch(targetId, event);
+  }
+
   // ── Private ───────────────────────────────────────────────────────────────
 
   private _resolveOverlaps(): void {
