@@ -1,9 +1,12 @@
 import { Scene, GameObjects } from 'phaser';
 import { GameConfig } from '../../config/GameConfig';
 
+const PAD_COOLDOWN_FRAMES = 12;
+
 export class MainMenu extends Scene {
     private _cursor = 0;
     private _labels: GameObjects.Text[] = [];
+    private _padCooldown = 0;
 
     constructor() {
         super('MainMenuScene');
@@ -53,6 +56,26 @@ export class MainMenu extends Scene {
         this.input.keyboard?.on('keydown-S',     () => { this._move(1); });
         this.input.keyboard?.on('keydown-ENTER', () => { this._activate(); });
         this.input.keyboard?.on('keydown-SPACE', () => { this._activate(); });
+    }
+
+    update(): void {
+        if (this._padCooldown > 0) {
+            this._padCooldown--;
+            return;
+        }
+        const pad = this.input.gamepad?.getPad(0);
+        if (!pad) return;
+
+        if (pad.up) {
+            this._move(-1);
+            this._padCooldown = PAD_COOLDOWN_FRAMES;
+        } else if (pad.down) {
+            this._move(1);
+            this._padCooldown = PAD_COOLDOWN_FRAMES;
+        } else if (pad.A) {
+            this._activate();
+            this._padCooldown = PAD_COOLDOWN_FRAMES;
+        }
     }
 
     private _move(dir: -1 | 1): void {
