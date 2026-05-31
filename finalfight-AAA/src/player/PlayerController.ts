@@ -244,6 +244,7 @@ export class PlayerController {
    * @implements NFR-PL-03
    */
   fixedUpdate(dt: number): void {
+    // poll() called once per fixed-timestep tick — do not move outside accumulator loop
     const input = this._inputManager.poll();
     this._tickCountdowns();
     this._processInput(input);

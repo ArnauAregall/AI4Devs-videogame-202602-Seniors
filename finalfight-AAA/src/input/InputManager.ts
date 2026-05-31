@@ -75,8 +75,11 @@ export class InputManager {
 
   /**
    * Reads the current keyboard and gamepad state and returns a frozen
-   * {@link InputState} snapshot. Call once per fixed tick before any
-   * consumer reads the snapshot.
+   * {@link InputState} snapshot.
+   *
+   * @remarks Must be invoked exactly once per fixed-timestep tick inside the
+   * accumulator loop. Do not call per render frame — doing so violates the
+   * determinism contract (input state must reflect exactly one poll per tick).
    *
    * @spec input-manager – Requirement: InputManager polls keyboard every fixed tick
    * @implements NFR-PL-03

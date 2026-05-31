@@ -1,13 +1,5 @@
-# input-manager Specification
+## MODIFIED Requirements
 
-## Purpose
-TBD - created by archiving change player. Update Purpose after archive.
-
-## Fixed-Timestep Polling Contract
-
-`poll()` MUST be called exactly once per fixed-timestep update tick. `poll()` MUST NOT be called per render frame. The input state read during a tick reflects exactly one poll invocation for that tick, ensuring deterministic behaviour independent of frame rate.
-
-## Requirements
 ### Requirement: InputManager polls keyboard every fixed tick
 The system SHALL implement `InputManager.poll()` which reads Phaser's keyboard cursors and configured keys and returns a frozen `InputState` snapshot. `poll()` MUST be called exactly once per fixed-timestep update — never per render frame — to ensure deterministic input behaviour independent of frame rate.
 
@@ -28,19 +20,7 @@ The system SHALL implement `InputManager.poll()` which reads Phaser's keyboard c
 - **THEN** `poll()` is not invoked during those intermediate render frames
 
 ### Requirement: Default keyboard mapping matches FR-PL-12
-The system SHALL map the following keys by default. All mappings are **required/mandatory** and MUST be active simultaneously so either key in a pair triggers the action.
-
-| Action | Keys (required) |
-|---|---|
-| Movement left | Arrow Left, A |
-| Movement right | Arrow Right, D |
-| Movement up | Arrow Up, W |
-| Movement down | Arrow Down, S |
-| Light attack | Z, J |
-| Heavy attack | X, K |
-| Grab | C, L |
-| Jump | Space |
-| Special attack | Enter |
+The system SHALL map the following keys by default: Arrow keys and WASD for movement (left/right/up/down); Z or J for `lightAttack`; X or K for `heavyAttack`; C or L for `grab`; Space for `jump`; Enter for `specialAttack`. All mappings MUST be active simultaneously so either key in a pair triggers the action.
 
 #### Scenario: Arrow keys control movement
 - **WHEN** the LEFT arrow key is held and `poll()` is called
@@ -69,18 +49,3 @@ The system SHALL map the following keys by default. All mappings are **required/
 #### Scenario: Enter triggers special attack
 - **WHEN** the Enter key is pressed
 - **THEN** `inputState.specialAttack` is `true`
-
-### Requirement: Gamepad input maps to the same InputState fields
-The system SHALL read the connected gamepad (index 0) and map: left stick / d-pad for movement; A/Cross for `jump`; X/Square for `lightAttack`; Y/Triangle for `heavyAttack`; B/Circle for `grab`; LB/L1 for `specialAttack`. Gamepad and keyboard inputs are OR-combined.
-
-#### Scenario: Gamepad and keyboard are additive
-- **WHEN** the gamepad d-pad left is held AND the left arrow key is also held
-- **THEN** `inputState.left` is `true` (both sources contribute)
-
-### Requirement: Gamepad connect/disconnect is handled gracefully
-The system SHALL detect gamepad connection and disconnection events without throwing or crashing. When a gamepad disconnects mid-game, `InputManager` MUST fall back to keyboard-only input silently.
-
-#### Scenario: Disconnected gamepad falls back to keyboard
-- **WHEN** a gamepad disconnects and `poll()` is called
-- **THEN** no exception is thrown and keyboard input still functions
-
