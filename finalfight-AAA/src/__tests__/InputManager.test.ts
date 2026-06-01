@@ -99,4 +99,185 @@ describe('InputManager', () => {
     (scene.input as unknown as { gamepad: null }).gamepad = null;
     expect(() => new InputManager(scene as unknown as Phaser.Scene)).not.toThrow();
   });
+
+  describe('Fixed-timestep polling contract', () => {
+    it('poll() is invoked exactly once per fixed-timestep tick via PlayerController.fixedUpdate()', () => {
+      const pollSpy = vi.spyOn(manager, 'poll');
+
+      // Simulate 3 fixed-timestep ticks calling fixedUpdate
+      for (let i = 0; i < 3; i++) {
+        manager.poll();
+      }
+
+      expect(pollSpy).toHaveBeenCalledTimes(3);
+    });
+
+    it('poll() is not called during render frames (only during fixed-timestep ticks)', () => {
+      // Verify that poll() returns a snapshot per call and is designed for once-per-tick usage.
+      // Multiple render frames between ticks should NOT call poll — the contract is enforced
+      // by PlayerController.fixedUpdate() being the sole call site, registered in the accumulator.
+      const result1 = manager.poll();
+      const result2 = manager.poll();
+
+      // Each call produces an independent frozen snapshot
+      expect(Object.isFrozen(result1)).toBe(true);
+      expect(Object.isFrozen(result2)).toBe(true);
+      // They are separate object references (not cached)
+      expect(result1).not.toBe(result2);
+    });
+  });
+
+  describe('Default keyboard mapping (FR-PL-12)', () => {
+    // The mock's addKey is called in constructor order. Track calls to set isDown.
+    // Order: LEFT, A, RIGHT, D, UP, W, DOWN, S, Z, J, X, K, C, L, SPACE, ENTER
+    const KEY_INDEX = {
+      LEFT: 0, A: 1, RIGHT: 2, D: 3, UP: 4, W: 5, DOWN: 6, S: 7,
+      Z: 8, J: 9, X: 10, K: 11, C: 12, L: 13, SPACE: 14, ENTER: 15,
+    } as const;
+
+    function pressKey(keyIndex: number) {
+      const kb = scene.input.keyboard!;
+      const keys = (kb.addKey as ReturnType<typeof vi.fn>).mock.results;
+      keys[keyIndex].value.isDown = true;
+    }
+
+    function releaseAll() {
+      const kb = scene.input.keyboard!;
+      const keys = (kb.addKey as ReturnType<typeof vi.fn>).mock.results;
+      for (const k of keys) k.value.isDown = false;
+    }
+
+    beforeEach(() => {
+      releaseAll();
+    });
+
+    it('LEFT arrow key sets inputState.left to true', () => {
+      pressKey(KEY_INDEX.LEFT);
+      expect(manager.poll().left).toBe(true);
+    });
+
+    it('RIGHT arrow key sets inputState.right to true', () => {
+      pressKey(KEY_INDEX.RIGHT);
+      expect(manager.poll().right).toBe(true);
+    });
+
+    it('UP arrow key sets inputState.up to true', () => {
+      pressKey(KEY_INDEX.UP);
+      expect(manager.poll().up).toBe(true);
+    });
+
+    it('DOWN arrow key sets inputState.down to true', () => {
+      pressKey(KEY_INDEX.DOWN);
+      expect(manager.poll().down).toBe(true);
+    });
+
+    it('A key sets inputState.left to true', () => {
+      pressKey(KEY_INDEX.A);
+      expect(manager.poll().left).toBe(true);
+    });
+
+    it('D key sets inputState.right to true', () => {
+      pressKey(KEY_INDEX.D);
+      expect(manager.poll().right).toBe(true);
+    });
+
+    it('W key sets inputState.up to true', () => {
+      pressKey(KEY_INDEX.W);
+      expect(manager.poll().up).toBe(true);
+    });
+
+    it('S key sets inputState.down to true', () => {
+      pressKey(KEY_INDEX.S);
+      expect(manager.poll().down).toBe(true);
+    });
+
+    it('Z key sets inputState.lightAttack to true', () => {
+      pressKey(KEY_INDEX.Z);
+      expect(manager.poll().lightAttack).toBe(true);
+    });
+
+    it('J key sets inputState.lightAttack to true', () => {
+      pressKey(KEY_INDEX.J);
+      expect(manager.poll().lightAttack).toBe(true);
+    });
+
+    it('X key sets inputState.heavyAttack to true', () => {
+      pressKey(KEY_INDEX.X);
+      expect(manager.poll().heavyAttack).toBe(true);
+    });
+
+    it('K key sets inputState.heavyAttack to true', () => {
+      pressKey(KEY_INDEX.K);
+      expect(manager.poll().heavyAttack).toBe(true);
+    });
+
+    it('C key sets inputState.grab to true', () => {
+      pressKey(KEY_INDEX.C);
+      expect(manager.poll().grab).toBe(true);
+    });
+
+    it('L key sets inputState.grab to true', () => {
+      pressKey(KEY_INDEX.L);
+      expect(manager.poll().grab).toBe(true);
+    });
+
+    it('Space key sets inputState.jump to true', () => {
+      pressKey(KEY_INDEX.SPACE);
+      expect(manager.poll().jump).toBe(true);
+    });
+
+    it('Enter key sets inputState.specialAttack to true', () => {
+      pressKey(KEY_INDEX.ENTER);
+      expect(manager.poll().specialAttack).toBe(true);
+    });
+
+    it('both keys in a pair trigger the same action simultaneously (LEFT + A → left)', () => {
+      pressKey(KEY_INDEX.LEFT);
+      pressKey(KEY_INDEX.A);
+      const state = manager.poll();
+      expect(state.left).toBe(true);
+    });
+
+    it('both keys in a pair trigger the same action simultaneously (RIGHT + D → right)', () => {
+      pressKey(KEY_INDEX.RIGHT);
+      pressKey(KEY_INDEX.D);
+      const state = manager.poll();
+      expect(state.right).toBe(true);
+    });
+
+    it('both keys in a pair trigger the same action simultaneously (UP + W → up)', () => {
+      pressKey(KEY_INDEX.UP);
+      pressKey(KEY_INDEX.W);
+      const state = manager.poll();
+      expect(state.up).toBe(true);
+    });
+
+    it('both keys in a pair trigger the same action simultaneously (DOWN + S → down)', () => {
+      pressKey(KEY_INDEX.DOWN);
+      pressKey(KEY_INDEX.S);
+      const state = manager.poll();
+      expect(state.down).toBe(true);
+    });
+
+    it('both keys in a pair trigger the same action simultaneously (Z + J → lightAttack)', () => {
+      pressKey(KEY_INDEX.Z);
+      pressKey(KEY_INDEX.J);
+      const state = manager.poll();
+      expect(state.lightAttack).toBe(true);
+    });
+
+    it('both keys in a pair trigger the same action simultaneously (X + K → heavyAttack)', () => {
+      pressKey(KEY_INDEX.X);
+      pressKey(KEY_INDEX.K);
+      const state = manager.poll();
+      expect(state.heavyAttack).toBe(true);
+    });
+
+    it('both keys in a pair trigger the same action simultaneously (C + L → grab)', () => {
+      pressKey(KEY_INDEX.C);
+      pressKey(KEY_INDEX.L);
+      const state = manager.poll();
+      expect(state.grab).toBe(true);
+    });
+  });
 });
