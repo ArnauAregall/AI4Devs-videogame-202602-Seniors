@@ -1,4 +1,4 @@
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: Player health bar displays current health proportion
 `HealthBar` SHALL render a rectangular bar on the fixed HUD overlay whose filled width equals `current / max` of the 100 HP maximum. The bar SHALL update its width within the same render frame when a `PLAYER_HEALTH_CHANGED` event fires, with no visible lag.
