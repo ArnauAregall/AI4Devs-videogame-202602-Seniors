@@ -99,4 +99,18 @@ describe('StageTimer', () => {
     timer.destroy();
     expect(mocks.sceneMock.unregisterFixedUpdate).toHaveBeenCalledOnce();
   });
+
+  it('stop() halts countdown — secondsRemaining does not decrease', () => {
+    // Tick a few times first
+    for (let i = 0; i < GameConfig.TARGET_FPS; i++) {
+      registeredCallback(GameConfig.FIXED_DELTA_MS);
+    }
+    const afterOneSec = timer.secondsRemaining;
+    timer.stop();
+    // Tick more — should not change
+    for (let i = 0; i < GameConfig.TARGET_FPS * 5; i++) {
+      registeredCallback(GameConfig.FIXED_DELTA_MS);
+    }
+    expect(timer.secondsRemaining).toBe(afterOneSec);
+  });
 });

@@ -50,7 +50,7 @@ describe('TimerDisplay', () => {
   it(`initialises at ${HUD_TIMER_START_SECONDS} seconds`, () => {
     const display = new TimerDisplay(scene as never);
     expect(display.remaining).toBe(HUD_TIMER_START_SECONDS);
-    expect(scene._textMock.text).toBe(String(HUD_TIMER_START_SECONDS));
+    expect(scene._textMock.text).toBe('3:00');
   });
 
   it('uses normal (white) colour above warning threshold', () => {
@@ -75,12 +75,19 @@ describe('TimerDisplay', () => {
     const display = new TimerDisplay(scene as never);
     display.update(99);
     expect(display.remaining).toBe(99);
-    expect(scene._textMock.text).toBe('99');
+    expect(scene._textMock.text).toBe('1:39');
   });
 
   it('colour at 0 is warning', () => {
     const display = new TimerDisplay(scene as never);
     display.update(0);
+    expect(display.colour).toBe(WARNING_HEX);
+  });
+
+  it('displays M:SS format at warning threshold (30s)', () => {
+    const display = new TimerDisplay(scene as never);
+    display.update(30);
+    expect(scene._textMock.text).toBe('0:30');
     expect(display.colour).toBe(WARNING_HEX);
   });
 });
