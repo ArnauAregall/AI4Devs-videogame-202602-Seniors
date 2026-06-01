@@ -19,10 +19,16 @@ export class TimerDisplay {
   private readonly _text:   Phaser.GameObjects.Text;
   private _remaining: number;
 
+  private static _format(seconds: number): string {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}:${String(s).padStart(2, '0')}`;
+  }
+
   constructor(scene: Phaser.Scene) {
     this._remaining = HUD_TIMER_START_SECONDS;
     this._text = scene.add
-      .text(HUD_TIMER_X, HUD_TIMER_Y, String(this._remaining), {
+      .text(HUD_TIMER_X, HUD_TIMER_Y, TimerDisplay._format(this._remaining), {
         fontFamily: HUD_FONT_FAMILY,
         fontSize:   HUD_FONT_SIZE_NORMAL,
         color:      COLOUR_NORMAL,
@@ -34,7 +40,7 @@ export class TimerDisplay {
   /** @spec hud Update displayed time and warning colour. */
   update(remaining: number): void {
     this._remaining = remaining;
-    this._text.setText(String(remaining));
+    this._text.setText(TimerDisplay._format(remaining));
     this._text.setColor(
       remaining <= HUD_TIMER_WARNING_SECONDS ? COLOUR_WARNING : COLOUR_NORMAL,
     );
