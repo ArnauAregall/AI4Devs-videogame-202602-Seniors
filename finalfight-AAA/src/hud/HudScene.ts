@@ -4,7 +4,12 @@
  *
  * Launched by GameScene.create() and listens on GameScene's event bus.
  *
- * @spec hud
+ * All HUD elements (health bar, lives, score, combo, timer, boss bar, special
+ * cooldown) are rendered on this scene's **fixed overlay layer** — the camera
+ * never scrolls, ensuring the HUD remains visible throughout gameplay regardless
+ * of stage scroll position.
+ *
+ * @spec hud — FR-HU-14
  */
 import { Scene }                   from 'phaser';
 import { GameEvents }              from '../game/GameEvents';
@@ -35,6 +40,8 @@ export class HudScene extends Scene {
 
   create(): void {
     // Fix the HUD camera so it never scrolls with the game world.
+    // This ensures the health bar and all other HUD elements remain permanently
+    // visible on the fixed overlay layer throughout gameplay (FR-HU-14).
     this.cameras.main.setScroll(0, 0);
 
     // Instantiate components.

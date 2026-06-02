@@ -2,6 +2,10 @@
  * All HUD layout and style constants — single source of truth.
  * No magic numbers should appear in HUD component files.
  *
+ * Designers: you can safely change any value in this file to tune the HUD
+ * appearance without modifying component logic. Changes take effect
+ * immediately on the next build.
+ *
  * @spec hud
  */
 
@@ -9,9 +13,23 @@
 export const HUD_HEALTH_GREEN  = 0x22cc44;
 export const HUD_HEALTH_YELLOW = 0xffcc00;
 export const HUD_HEALTH_RED    = 0xff2222;
-/** Fraction at or below which bar turns yellow. */
+
+/**
+ * HP percentage (as a 0–1 fraction) at or below which the health bar turns yellow.
+ *
+ * Example: 0.5 means the bar turns yellow when the player has 50 % HP or less.
+ * Designer-tunable — changing this value here affects all health bar colour
+ * behaviour with no other code changes required.
+ */
 export const HUD_HEALTH_YELLOW_THRESHOLD = 0.5;
-/** Fraction at or below which bar turns red. */
+
+/**
+ * HP percentage (as a 0–1 fraction) at or below which the health bar turns red.
+ *
+ * Example: 0.25 means the bar turns red when the player has 25 % HP or less.
+ * Designer-tunable — changing this value here affects all health bar colour
+ * behaviour with no other code changes required.
+ */
 export const HUD_HEALTH_RED_THRESHOLD    = 0.25;
 
 // ── Timer ────────────────────────────────────────────────────────────────────

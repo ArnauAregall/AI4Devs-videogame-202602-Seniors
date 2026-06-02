@@ -7,8 +7,8 @@ The HUD (Heads-Up Display) subsystem provides the player with real-time informat
 ## Functional Requirements
 
 FR-HU-01: The HUD must display a health bar for the player that shows their current health as a proportion of their maximum health at all times during gameplay.
-FR-HU-02: The player health bar must update smoothly — decreasing health must be reflected in the bar within one frame of the damage event.
-FR-HU-03: The player health bar must change colour as health decreases: full or near-full health displays in green, medium health in yellow, and low health in red, with the threshold values defined as constants.
+FR-HU-02: The player health bar must update synchronously — bar width and fill colour must reflect the current health state in the same render frame that damage is applied, with no tween or deferred update.
+FR-HU-03: The player health bar must change colour as health decreases: full or near-full health displays in green, medium health in yellow, and low health in red. The threshold values must be defined as named constants in HudConfig.ts (HUD_HEALTH_YELLOW_THRESHOLD and HUD_HEALTH_RED_THRESHOLD) so designers can tune colour transitions without modifying component logic.
 FR-HU-04: The HUD must display the player's remaining lives count as a numeric value alongside an icon representing the player character.
 FR-HU-05: When the player loses a life, the lives display must update immediately after the respawn sequence begins.
 FR-HU-06: The HUD must display the current score as a right-aligned numeric value that updates every time points are awarded.
@@ -19,7 +19,7 @@ FR-HU-10: The combo counter must be displayed on screen when the active combo co
 FR-HU-11: The game over screen must display the text "GAME OVER", the player's final score, and two options: "Continue" (if continues are available) and "Quit to Main Menu".
 FR-HU-12: The stage clear screen must display the text "STAGE CLEAR", the player's score for the completed stage, and a time bonus if a time limit is in use.
 FR-HU-13: The pause menu must display "PAUSED", and provide options to resume, view controls, or quit to the main menu.
-FR-HU-14: All HUD elements must be rendered on a fixed overlay layer that does not scroll with the stage camera.
+FR-HU-14: All HUD elements must be rendered on a fixed overlay layer (HudScene with a non-scrolling camera) that remains permanently visible throughout gameplay regardless of stage camera position.
 FR-HU-15: Two-player mode is out of scope for the initial release; the HUD is designed for a single player only.
 FR-HU-16: All HUD text must use a font and size that remains legible at the target canvas resolution without anti-aliasing artefacts.
 FR-HU-17: The HUD must display a countdown timer showing the remaining stage time, starting at 3 minutes (180 seconds) and counting down to zero in whole seconds.
