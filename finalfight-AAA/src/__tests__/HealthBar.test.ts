@@ -65,6 +65,12 @@ describe('HealthBar', () => {
     expect(bar.fillColour).toBe(HUD_HEALTH_RED);
   });
 
+  it('fraction is 0 and colour is red at zero health', () => {
+    const bar = new HealthBar(scene as never, 0, 100);
+    expect(bar.fraction).toBe(0);
+    expect(bar.fillColour).toBe(HUD_HEALTH_RED);
+  });
+
   it('clamps fraction to 0 when current is negative', () => {
     const bar = new HealthBar(scene as never, -10, 100);
     expect(bar.fraction).toBe(0);
@@ -101,5 +107,14 @@ describe('HealthBar', () => {
     const bar = new HealthBar(scene as never, Math.round(HUD_HEALTH_RED_THRESHOLD * 100), 100);
     // fraction == threshold → NOT above → red
     expect(bar.fillColour).toBe(HUD_HEALTH_RED);
+  });
+
+  it('same-frame update: fraction reflects new value immediately after update()', () => {
+    const bar = new HealthBar(scene as never, 100, 100);
+    expect(bar.fraction).toBe(1);
+    bar.update(60, 100);
+    expect(bar.fraction).toBeCloseTo(0.6);
+    bar.update(10, 100);
+    expect(bar.fraction).toBeCloseTo(0.1);
   });
 });
