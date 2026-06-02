@@ -437,11 +437,18 @@ export class PlayerController {
       if (input.right) { this.sprite.x += spd; this.facingRight = true;  }
 
       // Depth movement (y axis, ground plane)
+      const prevBaseY = this._baseY;
       if (input.up)   this._baseY -= spd;
       if (input.down) this._baseY += spd;
 
       // Clamp ground plane
       this._baseY = Phaser.Math.Clamp(this._baseY, GameConfig.GROUND_TOP, GameConfig.GROUND_BOTTOM);
+
+      // Boundary-stop: if Walk with only vertical input and y didn't change, go Idle
+      if (s === PlayerState.Walk && !input.left && !input.right &&
+          (input.up || input.down) && this._baseY === prevBaseY) {
+        this._stateMachine.transition(PlayerState.Idle);
+      }
 
       this.sprite.setFlipX(!this.facingRight);
       this.sprite.y = this._baseY;
