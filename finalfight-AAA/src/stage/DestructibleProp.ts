@@ -8,7 +8,9 @@
 import Phaser from 'phaser';
 import {
   ASSET_KEY_PROP_BARREL,
+  ASSET_KEY_PROP_DEBRIS,
 } from '../assets/AssetKeys';
+import { GameConfig } from '../config/GameConfig';
 import type { PropDef, ItemType } from './StageData';
 
 export type SpawnItemCallback = (type: ItemType, worldX: number, worldY: number) => void;
@@ -19,10 +21,10 @@ const CRUSHED_LINGER_MS = 300;
 export class DestructibleProp {
   /**
    * Single sprite — shows the intact barrel for all hits; crushed tint is applied on destruction.
-   * Uses scene.add.image (no Arcade physics body) so the player can walk through freely.
+   * Uses scene.add.sprite (no Arcade physics body) so the player can walk through freely.
    * @spec FR-DP-01, FR-DP-02
    */
-  private readonly _sprite: Phaser.GameObjects.Image;
+  private readonly _sprite: Phaser.GameObjects.Sprite;
 
   private _hp: number;
   /** Number of times hit() has been called (each call = one hit). @spec FR-DP-02 */
@@ -38,11 +40,11 @@ export class DestructibleProp {
   ) {
     this._hp = def.hp;
 
-    // Both 'barrel' and 'crate' use barrel asset as placeholder (crate sprite unavailable)
+    // All subtypes use barrel asset as placeholder (crate/dumpster sprites unavailable)
     const textureKey = ASSET_KEY_PROP_BARREL;
     const screenX = def.worldX - getCameraX();
 
-    this._sprite = scene.add.image(screenX, def.worldY, textureKey);
+    this._sprite = scene.add.sprite(screenX, def.worldY, textureKey);
     this._sprite.setDepth(6);
     this._sprite.setFrame(0); // frame 0 = intact state
 
@@ -75,8 +77,9 @@ export class DestructibleProp {
   /** True after destruction begins. */
   get isDead(): boolean { return this._dead; }
 
-  /** Screen-space hurtbox rect for collision queries. Matches the screen-space hitbox system. @spec FR-DP-02 */
+  /** Screen-space hurtbox rect for collision queries. Returns zero-size when dead. @spec FR-DP-02, FR-DP-03 */
   get hurtboxRect(): { x: number; y: number; w: number; h: number } {
+    if (this._dead) return { x: 0, y: 0, w: 0, h: 0 };
     const w = this._sprite.displayWidth || 32;
     const h = this._sprite.displayHeight || 48;
     return {
@@ -93,48 +96,53 @@ export class DestructibleProp {
   }
 
   /**
-   * Apply crushed tint to the sprite and schedule the destruction tween.
-   * @spec FR-DP-03
+   * Apply crushed frame and play destruction animation.
+   * @spec FR-DP-03, FR-DP-06
    */
   private _scheduleDestroy(): void {
     if (this._dead) return;
     this._dead = true;
     this.scene.unregisterFixedUpdate(this._fixedUpdateBound);
 
-    // Apply crushed frame before the linger delay. @spec barrel-damage-states
+    // Apply crushed frame before destruction animation. @spec barrel-damage-states
     this._sprite.setFrame(1); // frame 1 = crushed state
 
     this.scene.time.addEvent({
       delay: CRUSHED_LINGER_MS,
-      callback: this._destroy,
+      callback: this._playDestructionAnim,
       callbackScope: this,
     });
   }
 
-  private _destroy(): void {
+  private _playDestructionAnim(): void {
+    const animKey = 'prop-barrel-destroy';
+    this._sprite.play(animKey);
+    this._sprite.on('animationcomplete', this._onDestructionComplete, this);
+  }
+
+  private _onDestructionComplete(): void {
     // Probabilistic item drop. @spec health-item-drop, FR-DP-04
     if (this.def.dropItemType !== null && Math.random() < this.def.dropChance) {
       this.onSpawnItem(this.def.dropItemType, this.def.worldX, this.def.worldY);
     }
 
-    // Destruction tween: scale up then fade out (total ≤ 500 ms). @spec FR-DP-03
-    this.scene.tweens.add({
-      targets: this._sprite,
-      scaleX: 1.3,
-      scaleY: 1.3,
-      duration: 150,
-      yoyo: false,
-      onComplete: () => {
-        this.scene.tweens.add({
-          targets: this._sprite,
-          alpha: 0,
-          duration: 200,
-          onComplete: () => {
-            this._sprite.destroy();
-          },
-        });
-      },
+    // Emit debris particles. @spec destruction-particles
+    this._emitDebrisParticles();
+
+    this._sprite.destroy();
+  }
+
+  private _emitDebrisParticles(): void {
+    let count: number = GameConfig.DEBRIS_PARTICLE_COUNT;
+    if (GameConfig.PARTICLE_QUALITY === 'low') {
+      count = Math.floor(count * 0.5);
+    }
+    const emitter = this.scene.add.particles(this._sprite.x, this._sprite.y, ASSET_KEY_PROP_DEBRIS, {
+      lifespan: GameConfig.DEBRIS_PARTICLE_LIFESPAN_MS,
+      gravityY: GameConfig.DEBRIS_PARTICLE_GRAVITY_Y,
+      emitting: false,
     });
+    emitter.explode(count);
   }
 
   destroy(): void {

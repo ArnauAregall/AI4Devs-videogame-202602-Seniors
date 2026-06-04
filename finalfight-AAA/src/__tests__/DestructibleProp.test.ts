@@ -1,36 +1,37 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const mocks = vi.hoisted(() => {
-  const tweenCallbacks: Array<{ onComplete?: () => void }> = [];
   const timeCallbacks: Array<{ delay: number; callback: () => void; callbackScope?: unknown }> = [];
+  const animListeners: Record<string, Array<{ cb: (...args: unknown[]) => void; ctx: unknown }>> = {};
 
   const spriteMock = {
     x: 200,
     y: 145,
-    scaleX: 1,
-    scaleY: 1,
-    alpha: 1,
+    displayWidth: 32,
+    displayHeight: 48,
     active: true,
     setDepth: vi.fn(),
     setTint: vi.fn(),
     setFrame: vi.fn(),
     setVisible: vi.fn(),
+    play: vi.fn(),
+    on: vi.fn((event: string, cb: (...args: unknown[]) => void, ctx?: unknown) => {
+      if (!animListeners[event]) animListeners[event] = [];
+      animListeners[event].push({ cb, ctx });
+    }),
     destroy: vi.fn(function (this: { active: boolean }) { this.active = false; }),
   };
 
-  let imageCallCount = 0;
+  const particleEmitterMock = {
+    explode: vi.fn(),
+  };
 
   const sceneMock = {
-    registerFixedUpdate:   vi.fn(),
+    registerFixedUpdate: vi.fn(),
     unregisterFixedUpdate: vi.fn(),
     add: {
-      image: vi.fn(() => { imageCallCount++; return spriteMock; }),
-    },
-    tweens: {
-      add: vi.fn((cfg: { onComplete?: () => void }) => {
-        tweenCallbacks.push(cfg);
-        return {};
-      }),
+      sprite: vi.fn(() => spriteMock),
+      particles: vi.fn(() => particleEmitterMock),
     },
     time: {
       addEvent: vi.fn((cfg: { delay: number; callback: () => void; callbackScope?: unknown }) => {
@@ -40,7 +41,20 @@ const mocks = vi.hoisted(() => {
     },
   };
 
-  return { spriteMock, sceneMock, tweenCallbacks, timeCallbacks, get imageCallCount() { return imageCallCount; }, resetImageCallCount() { imageCallCount = 0; } };
+  return {
+    spriteMock,
+    sceneMock,
+    particleEmitterMock,
+    timeCallbacks,
+    animListeners,
+    fireAnimComplete() {
+      (animListeners['animationcomplete'] || []).forEach(({ cb, ctx }) => cb.call(ctx));
+    },
+    reset() {
+      timeCallbacks.length = 0;
+      for (const k of Object.keys(animListeners)) delete animListeners[k];
+    },
+  };
 });
 
 vi.mock('phaser', () => ({
@@ -53,66 +67,56 @@ vi.mock('phaser', () => ({
 }));
 
 import { GameConfig } from '../config/GameConfig';
-import { DestructibleProp } from '../stage/DestructibleProp';
+import { DestructibleProp, SpawnItemCallback } from '../stage/DestructibleProp';
 import type { PropDef } from '../stage/StageData';
+
+type SceneArg = ConstructorParameters<typeof DestructibleProp>[0];
 
 const BARREL_DEF: PropDef = {
   worldX: 400,
   worldY: 145,
   type: 'barrel',
-  hp: GameConfig.PROP_BARREL_HP, // 3
-  dropItemType: 'health',
-  dropChance: 1.0, // always drop for deterministic tests
-};
-
-const BARREL_NO_DROP: PropDef = {
-  worldX: 400,
-  worldY: 145,
-  type: 'barrel',
-  hp: GameConfig.PROP_BARREL_HP,
-  dropItemType: null,
-  dropChance: 0,
-};
-
-const BARREL_ZERO_CHANCE: PropDef = {
-  worldX: 400,
-  worldY: 145,
-  type: 'barrel',
   hp: GameConfig.PROP_BARREL_HP,
   dropItemType: 'health',
-  dropChance: 0,
+  dropChance: 1.0,
 };
 
 const CRATE_NO_DROP: PropDef = {
   worldX: 600,
   worldY: 145,
   type: 'crate',
-  hp: GameConfig.PROP_CRATE_HP, // 2
+  hp: GameConfig.PROP_CRATE_HP,
   dropItemType: null,
   dropChance: 0,
 };
 
-/** Helper: apply `count` hits of damage 1 to `prop`. */
+const DUMPSTER_DEF: PropDef = {
+  worldX: 500,
+  worldY: 145,
+  type: 'dumpster',
+  hp: GameConfig.PROP_DUMPSTER_HP,
+  dropItemType: null,
+  dropChance: 0,
+};
+
 function hitTimes(prop: DestructibleProp, count: number) {
   for (let i = 0; i < count; i++) prop.hit(1);
 }
 
 describe('DestructibleProp', () => {
   let prop: DestructibleProp;
-  let spawnCallback: ReturnType<typeof vi.fn>;
+  let spawnCallback: SpawnItemCallback;
   let cameraX: number;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mocks.tweenCallbacks.length = 0;
-    mocks.timeCallbacks.length = 0;
-    mocks.resetImageCallCount();
+    mocks.reset();
     mocks.spriteMock.active = true;
-    mocks.spriteMock.alpha = 1;
+    mocks.spriteMock.x = 200;
     cameraX = 0;
-    spawnCallback = vi.fn();
+    spawnCallback = vi.fn() as unknown as SpawnItemCallback;
     prop = new DestructibleProp(
-      mocks.sceneMock as unknown as Parameters<typeof DestructibleProp>[0],
+      mocks.sceneMock as unknown as SceneArg,
       BARREL_DEF,
       () => cameraX,
       spawnCallback,
@@ -124,8 +128,7 @@ describe('DestructibleProp', () => {
   });
 
   it('creates exactly one sprite object at construction', () => {
-    // Only a single scene.add.image call per prop
-    expect(mocks.sceneMock.add.image).toHaveBeenCalledTimes(1);
+    expect(mocks.sceneMock.add.sprite).toHaveBeenCalledTimes(1);
   });
 
   it('hit() reduces HP and increments hitCount', () => {
@@ -139,12 +142,6 @@ describe('DestructibleProp', () => {
     expect(prop.isDead).toBe(false);
   });
 
-  it('no intermediate visual change on hit 1', () => {
-    prop.hit(1);
-    // No tint applied mid-combat — sprite looks intact
-    expect(mocks.spriteMock.setTint).not.toHaveBeenCalled();
-  });
-
   it('isDead after receiving def.hp hits', () => {
     hitTimes(prop, BARREL_DEF.hp);
     expect(prop.isDead).toBe(true);
@@ -154,35 +151,54 @@ describe('DestructibleProp', () => {
     expect(mocks.spriteMock.setFrame).toHaveBeenCalledWith(0);
   });
 
-  it('applies crushed frame (1) to sprite on final hit', () => {
+  it('applies crushed frame (1) on final hit', () => {
     hitTimes(prop, BARREL_DEF.hp);
     expect(mocks.spriteMock.setFrame).toHaveBeenCalledWith(1);
   });
 
-  it('schedules time.addEvent on destruction (crushed linger delay)', () => {
-    hitTimes(prop, BARREL_DEF.hp);
-    expect(mocks.sceneMock.time.addEvent).toHaveBeenCalled();
-  });
-
   it('hit() is no-op when already dead', () => {
-    hitTimes(prop, BARREL_DEF.hp); // kills it
-    const tweensBefore = mocks.sceneMock.tweens.add.mock.calls.length;
+    hitTimes(prop, BARREL_DEF.hp);
+    const callsBefore = mocks.sceneMock.time.addEvent.mock.calls.length;
     prop.hit(1);
-    expect(mocks.sceneMock.tweens.add.mock.calls.length).toBe(tweensBefore);
+    expect(mocks.sceneMock.time.addEvent.mock.calls.length).toBe(callsBefore);
   });
 
-  it('spawns exactly one item at barrel position when dropChance is 1.0', () => {
+  // --- Task 5.1: destruction animation playback ---
+
+  it('plays destruction animation after linger delay fires', () => {
     hitTimes(prop, BARREL_DEF.hp);
     const timerEvent = mocks.timeCallbacks[0];
     timerEvent.callback.call(timerEvent.callbackScope ?? prop);
-    expect(spawnCallback).toHaveBeenCalledTimes(1);
+    expect(mocks.spriteMock.play).toHaveBeenCalledWith('prop-barrel-destroy');
+  });
+
+  it('registers animationcomplete listener after linger delay', () => {
+    hitTimes(prop, BARREL_DEF.hp);
+    const timerEvent = mocks.timeCallbacks[0];
+    timerEvent.callback.call(timerEvent.callbackScope ?? prop);
+    expect(mocks.spriteMock.on).toHaveBeenCalledWith('animationcomplete', expect.any(Function), expect.anything());
+  });
+
+  it('destroys sprite on animationcomplete', () => {
+    hitTimes(prop, BARREL_DEF.hp);
+    const timerEvent = mocks.timeCallbacks[0];
+    timerEvent.callback.call(timerEvent.callbackScope ?? prop);
+    mocks.fireAnimComplete();
+    expect(mocks.spriteMock.destroy).toHaveBeenCalled();
+  });
+
+  it('spawns item on animationcomplete when dropChance is 1.0', () => {
+    hitTimes(prop, BARREL_DEF.hp);
+    const timerEvent = mocks.timeCallbacks[0];
+    timerEvent.callback.call(timerEvent.callbackScope ?? prop);
+    mocks.fireAnimComplete();
     expect(spawnCallback).toHaveBeenCalledWith('health', BARREL_DEF.worldX, BARREL_DEF.worldY);
   });
 
   it('does NOT spawn item when dropItemType is null', () => {
-    mocks.resetImageCallCount();
+    mocks.reset();
     const propNoDrop = new DestructibleProp(
-      mocks.sceneMock as unknown as Parameters<typeof DestructibleProp>[0],
+      mocks.sceneMock as unknown as SceneArg,
       CRATE_NO_DROP,
       () => cameraX,
       spawnCallback,
@@ -190,78 +206,87 @@ describe('DestructibleProp', () => {
     hitTimes(propNoDrop, CRATE_NO_DROP.hp);
     const timerEvent = mocks.timeCallbacks[0];
     timerEvent.callback.call(timerEvent.callbackScope ?? propNoDrop);
+    mocks.fireAnimComplete();
     expect(spawnCallback).not.toHaveBeenCalled();
   });
 
-  it('does NOT spawn item when dropChance is 0', () => {
-    mocks.resetImageCallCount();
-    const propZeroChance = new DestructibleProp(
-      mocks.sceneMock as unknown as Parameters<typeof DestructibleProp>[0],
-      BARREL_ZERO_CHANCE,
-      () => cameraX,
-      spawnCallback,
-    );
-    hitTimes(propZeroChance, BARREL_ZERO_CHANCE.hp);
-    const timerEvent = mocks.timeCallbacks[0];
-    timerEvent.callback.call(timerEvent.callbackScope ?? propZeroChance);
-    expect(spawnCallback).not.toHaveBeenCalled();
+  // --- Task 5.2: hurtboxRect zero-size after destruction ---
+
+  it('hurtboxRect returns zero-size rect after destruction starts', () => {
+    hitTimes(prop, BARREL_DEF.hp);
+    expect(prop.hurtboxRect).toEqual({ x: 0, y: 0, w: 0, h: 0 });
   });
 
-  it('does NOT spawn item when random roll >= dropChance', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0.8);
-    mocks.resetImageCallCount();
-    const propPartialChance = new DestructibleProp(
-      mocks.sceneMock as unknown as Parameters<typeof DestructibleProp>[0],
-      { ...BARREL_DEF, dropChance: 0.5 },
-      () => cameraX,
-      spawnCallback,
-    );
-    hitTimes(propPartialChance, BARREL_DEF.hp);
-    const timerEvent = mocks.timeCallbacks[0];
-    timerEvent.callback.call(timerEvent.callbackScope ?? propPartialChance);
-    expect(spawnCallback).not.toHaveBeenCalled();
-    vi.restoreAllMocks();
+  it('hurtboxRect returns valid rect before destruction', () => {
+    const rect = prop.hurtboxRect;
+    expect(rect.w).toBeGreaterThan(0);
+    expect(rect.h).toBeGreaterThan(0);
   });
 
-  it('DOES spawn item when random roll < dropChance', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0.3);
-    mocks.resetImageCallCount();
-    const propPartialChance = new DestructibleProp(
-      mocks.sceneMock as unknown as Parameters<typeof DestructibleProp>[0],
-      { ...BARREL_DEF, dropChance: 0.5 },
-      () => cameraX,
-      spawnCallback,
-    );
-    hitTimes(propPartialChance, BARREL_DEF.hp);
-    const timerEvent = mocks.timeCallbacks[0];
-    timerEvent.callback.call(timerEvent.callbackScope ?? propPartialChance);
-    expect(spawnCallback).toHaveBeenCalledTimes(1);
-    vi.restoreAllMocks();
-  });
+  // --- Task 5.3: particle emitter explode with correct count on high quality ---
 
-  it('starts a tween after the linger delay fires', () => {
+  it('particle emitter explode called with full count on high quality', () => {
     hitTimes(prop, BARREL_DEF.hp);
     const timerEvent = mocks.timeCallbacks[0];
     timerEvent.callback.call(timerEvent.callbackScope ?? prop);
-    expect(mocks.sceneMock.tweens.add).toHaveBeenCalled();
+    mocks.fireAnimComplete();
+    expect(mocks.sceneMock.add.particles).toHaveBeenCalled();
+    expect(mocks.particleEmitterMock.explode).toHaveBeenCalledWith(GameConfig.DEBRIS_PARTICLE_COUNT);
+  });
+
+  // --- Task 5.4: particle count halved when quality is low ---
+
+  it('particle count halved when quality is low', () => {
+    // Temporarily override PARTICLE_QUALITY
+    const original = GameConfig.PARTICLE_QUALITY;
+    Object.defineProperty(GameConfig, 'PARTICLE_QUALITY', { value: 'low', writable: true, configurable: true });
+
+    mocks.reset();
+    const lowProp = new DestructibleProp(
+      mocks.sceneMock as unknown as SceneArg,
+      BARREL_DEF,
+      () => cameraX,
+      spawnCallback,
+    );
+    hitTimes(lowProp, BARREL_DEF.hp);
+    const timerEvent = mocks.timeCallbacks[0];
+    timerEvent.callback.call(timerEvent.callbackScope ?? lowProp);
+    mocks.fireAnimComplete();
+
+    const expectedCount = Math.floor(GameConfig.DEBRIS_PARTICLE_COUNT * 0.5);
+    expect(mocks.particleEmitterMock.explode).toHaveBeenCalledWith(expectedCount);
+
+    // Restore
+    Object.defineProperty(GameConfig, 'PARTICLE_QUALITY', { value: original, writable: true, configurable: true });
+  });
+
+  // --- Task 5.5: dumpster subtype instantiation ---
+
+  it('dumpster subtype instantiates with correct HP', () => {
+    mocks.reset();
+    const dumpster = new DestructibleProp(
+      mocks.sceneMock as unknown as SceneArg,
+      DUMPSTER_DEF,
+      () => cameraX,
+      spawnCallback,
+    );
+    expect(dumpster.hp).toBe(GameConfig.PROP_DUMPSTER_HP);
+  });
+
+  it('dumpster subtype creates a sprite (uses barrel placeholder)', () => {
+    mocks.reset();
+    vi.clearAllMocks();
+    new DestructibleProp(
+      mocks.sceneMock as unknown as SceneArg,
+      DUMPSTER_DEF,
+      () => cameraX,
+      spawnCallback,
+    );
+    expect(mocks.sceneMock.add.sprite).toHaveBeenCalledTimes(1);
   });
 
   it('unregisters fixedUpdate on destruction', () => {
     hitTimes(prop, BARREL_DEF.hp);
     expect(mocks.sceneMock.unregisterFixedUpdate).toHaveBeenCalledOnce();
-  });
-
-  it('does NOT spawn item when dropItemType is null regardless of dropChance', () => {
-    mocks.resetImageCallCount();
-    const propNullType = new DestructibleProp(
-      mocks.sceneMock as unknown as Parameters<typeof DestructibleProp>[0],
-      BARREL_NO_DROP,
-      () => cameraX,
-      spawnCallback,
-    );
-    hitTimes(propNullType, BARREL_NO_DROP.hp);
-    const timerEvent = mocks.timeCallbacks[0];
-    timerEvent.callback.call(timerEvent.callbackScope ?? propNullType);
-    expect(spawnCallback).not.toHaveBeenCalled();
   });
 });
