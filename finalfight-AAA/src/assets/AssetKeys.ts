@@ -92,6 +92,8 @@ export const ASSET_KEY_CYBERPUNK_LAYER_6 = 'cyberpunk-layer-6';
 // ------------------------------------------------------------
 
 export const ASSET_KEY_PROP_BARREL        = 'prop-barrel';
+export const ASSET_KEY_PROP_BARREL_DESTROY = 'prop-barrel-destroy';
+export const ASSET_KEY_PROP_DEBRIS        = 'prop-debris';
 export const ASSET_KEY_PROP_CAR           = 'prop-car';
 export const ASSET_KEY_PROP_HYDRANT       = 'prop-hydrant';
 export const ASSET_KEY_PROP_BANNER_HOR_1  = 'prop-banner-hor-1';
@@ -177,6 +179,8 @@ export const ASSET_PATH: Readonly<Record<string, string>> = {
   [ASSET_KEY_CYBERPUNK_LAYER_6]: 'stage/layers/cyberpunk-layer-6.png',
   // Props
   [ASSET_KEY_PROP_BARREL]:        'stage/props/prop-barrel.png',
+  [ASSET_KEY_PROP_BARREL_DESTROY]: 'stage/props/prop-barrel-destroy.png',
+  [ASSET_KEY_PROP_DEBRIS]:        'stage/props/prop-debris.png',
   [ASSET_KEY_PROP_CAR]:           'stage/props/prop-car.png',
   [ASSET_KEY_PROP_HYDRANT]:       'stage/props/prop-hydrant.png',
   [ASSET_KEY_PROP_BANNER_HOR_1]:  'stage/props/prop-banner-hor-1.png',
@@ -240,4 +244,6 @@ export const ASSET_FRAME_CONFIG: Readonly<Record<string, FrameConfig>> = {
   [ASSET_KEY_CYBERPUNK_DECORATIONS]: { frameWidth: 16, frameHeight: 16 }, // TODO: verify
   // Props — barrel spritesheet: frame 0 = intact, frame 1 = crushed (64×48, 2 frames of 32×48)
   [ASSET_KEY_PROP_BARREL]: { frameWidth: 32, frameHeight: 48 }, // 2 frames
+  // Props — barrel destruction spritesheet (placeholder: same frame size as barrel)
+  [ASSET_KEY_PROP_BARREL_DESTROY]: { frameWidth: 32, frameHeight: 48 },
 };

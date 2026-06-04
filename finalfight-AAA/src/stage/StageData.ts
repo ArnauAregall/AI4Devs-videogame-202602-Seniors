@@ -52,7 +52,7 @@ export interface PropDef {
   /** World Y position (px) — typically ground-plane centre. */
   worldY: number;
   /** Prop subtype (maps to a texture key). */
-  type: 'barrel' | 'crate';
+  type: 'barrel' | 'crate' | 'dumpster';
   /** Hit-points before the prop is destroyed. */
   hp: number;
   /** Item to spawn on destruction, or null for no drop. */

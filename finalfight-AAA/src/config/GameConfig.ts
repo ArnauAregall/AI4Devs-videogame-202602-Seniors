@@ -73,6 +73,18 @@ export const GameConfig = {
   /** Half-width (px) of the player body used for boundary clamping. @spec FR-SM-05 */
   PLAYER_BODY_HALF_WIDTH: 20,
 
+  // ── Destruction particles ─────────────────────────────────────────────────
+  /** Quality setting for debris particles: 'high' = full count, 'low' = 50%. @spec destruction-particles */
+  PARTICLE_QUALITY: 'high' as 'high' | 'low',
+  /** Base number of debris particles emitted on prop destruction. @spec destruction-particles */
+  DEBRIS_PARTICLE_COUNT: 12,
+  /** Downward gravity (px/s²) applied to debris particles. @spec destruction-particles */
+  DEBRIS_PARTICLE_GRAVITY_Y: 300,
+  /** Lifespan (ms) of each debris particle before self-destruction. @spec destruction-particles */
+  DEBRIS_PARTICLE_LIFESPAN_MS: 800,
+  /** Hit-points of a dumpster prop. @spec FR-DP-05 */
+  PROP_DUMPSTER_HP: 4,
+
   // ── Combat ───────────────────────────────────────────────────────────────
   /** When true, DebugRenderer draws hitbox/hurtbox outlines each frame. @spec FR-CS-17, NFR-CS-04 */
   DEBUG_HITBOXES: false,
