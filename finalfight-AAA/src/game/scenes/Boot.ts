@@ -16,6 +16,8 @@ export class Boot extends Scene {
         const cx = width / 2;
         const cy = height / 2;
 
+        this.cameras.main.setBackgroundColor('#000000');
+
         if (this.textures.exists(ASSET_KEY_LOADING_BG)) {
             this.add.image(cx, cy, ASSET_KEY_LOADING_BG).setDisplaySize(width, height);
         }
