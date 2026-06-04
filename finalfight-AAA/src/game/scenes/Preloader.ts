@@ -20,6 +20,8 @@ export class Preloader extends Scene {
         const barX = cx - BAR_WIDTH / 2;
         const barY = height / 2 + BAR_Y_OFFSET;
 
+        this.cameras.main.setBackgroundColor('#000000');
+
         if (this.textures.exists(ASSET_KEY_LOADING_BG)) {
             this.add.image(cx, height / 2, ASSET_KEY_LOADING_BG);
         }
@@ -48,6 +50,7 @@ export class Preloader extends Scene {
         });
 
         this.loadAssets();
+        this.load.start();
     }
 
     private loadAssets(): void {
