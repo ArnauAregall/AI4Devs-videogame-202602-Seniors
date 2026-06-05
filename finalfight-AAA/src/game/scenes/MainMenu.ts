@@ -4,6 +4,10 @@ import { GameConfig } from '../../config/GameConfig';
 export class MainMenu extends Scene {
     private _cursor = 0;
     private _labels: GameObjects.Text[] = [];
+    private _lastGamepadNav = 0;
+    private _lastGamepadConfirm = 0;
+    private static readonly GAMEPAD_DEBOUNCE = 200;
+    private static readonly DEAD_ZONE = 0.5;
 
     constructor() {
         super('MainMenuScene');
@@ -53,6 +57,30 @@ export class MainMenu extends Scene {
         this.input.keyboard?.on('keydown-S',     () => { this._move(1); });
         this.input.keyboard?.on('keydown-ENTER', () => { this._activate(); });
         this.input.keyboard?.on('keydown-SPACE', () => { this._activate(); });
+    }
+
+    update(_time: number, _delta: number): void {
+        const pad = this.input.gamepad?.pad1;
+        if (!pad) return;
+
+        const now = this.time.now;
+        const dz = MainMenu.DEAD_ZONE;
+        const db = MainMenu.GAMEPAD_DEBOUNCE;
+
+        const axisY = pad.axes.length > 1 ? pad.axes[1].getValue() : 0;
+        const wantUp = pad.up || axisY < -dz;
+        const wantDown = pad.down || axisY > dz;
+
+        if ((wantUp || wantDown) && now - this._lastGamepadNav >= db) {
+            this._lastGamepadNav = now;
+            if (wantUp) this._move(-1);
+            else this._move(1);
+        }
+
+        if (pad.A && now - this._lastGamepadConfirm >= db) {
+            this._lastGamepadConfirm = now;
+            this._activate();
+        }
     }
 
     private _move(dir: -1 | 1): void {
